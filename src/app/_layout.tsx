@@ -6,7 +6,8 @@ const RootLayout = () => {
     <>
       <StatusBar style="auto" />
       <Stack>
-        <Stack.Screen name="(app)/index" options={{ title: 'Home' }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(app)/index" options={{ title: "Home" }} />
       </Stack>
     </>
   );
