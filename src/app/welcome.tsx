@@ -25,7 +25,7 @@ export default function WelcomeScreen() {
 
   const handleCreateAccount = () => {
     if (agreedToTerms) {
-      router.push("/(auth)/register");
+      router.push("/(auth)/signup");
     }
   };
 
