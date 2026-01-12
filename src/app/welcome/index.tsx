@@ -17,7 +17,7 @@ import XIcon from "../../assets/icons/x.svg";
 import ParuIcon from "../../assets/icons/paru.svg";
 import WhiteStar from "../../assets/icons/whitestar.svg";
 import GreenStar from "../../assets/icons/green-star.svg";
-import { AppText } from "../components/Typography";
+import { AppText } from "../../components/Typography";
 
 const { height, width } = Dimensions.get("window");
 

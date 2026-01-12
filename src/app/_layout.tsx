@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { Slot } from "expo-router";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
-// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -37,10 +37,21 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    // Let SplashScreen stay visible until fonts are ready
     return null;
   }
 
-  // Render the routed app once fonts are loaded
-  return <Slot />;
-}
+  return (
+    <>
+      <StatusBar style="auto" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="welcome/index" />
+        <Stack.Screen name="questionnaire/index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(app)/index" />
+      </Stack>
+    </>
+  );
+};
+
+export default RootLayout;

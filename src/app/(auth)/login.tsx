@@ -65,6 +65,9 @@ export default function Login() {
     }
 
     console.log("Login pressed", { email, password });
+    // TODO: Implement actual login API call
+    // Navigate to questionnaire after successful login
+    router.replace("/questionnaire");
   };
 
   return (
