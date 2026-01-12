@@ -6,6 +6,7 @@ import {
   Pressable,
   Dimensions,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,6 +17,7 @@ import XIcon from "../../assets/icons/x.svg";
 import ParuIcon from "../../assets/icons/paru.svg";
 import WhiteStar from "../../assets/icons/whitestar.svg";
 import GreenStar from "../../assets/icons/green-star.svg";
+import { AppText } from "../components/Typography";
 
 const { height, width } = Dimensions.get("window");
 
@@ -34,9 +36,15 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View className="flex-1">
+    <SafeAreaView className="flex-1" edges={["bottom"]}>
       <StatusBar style="light" />
 
+      <TouchableOpacity
+        className="absolute top-10 right-6 z-20"
+        onPress={() => { router.push("/home"); }}
+      >
+        <AppText className="text-white text-base">Lewati</AppText>
+      </TouchableOpacity>
       <LinearGradient
         colors={["#728C69", "#728C69", "#FFE884"]}
         locations={[0, 0.2, 1]}
@@ -111,20 +119,23 @@ export default function WelcomeScreen() {
           />
 
           {/* Content on top of curved background */}
-          <View className="flex-1 z-10 pt-6">
+          <View className="flex-1 z-10 pt-10">
             {/* Small Icon at top of card */}
-            <View className="items-center mb-4">
+            <View className="items-center mb-6">
               <NirmalaIconDark width={34} height={34} color="#6B8E6B" />
             </View>
 
             {/* Welcome Text */}
             <View className="items-center mb-8 px-6">
-              <Text className="text-2xl font-bold text-gray-800 mb-2 text-center">
+              <AppText
+                weight="bold"
+                className="text-3xl text-gray-800 mb-1 text-center"
+              >
                 Selamat datang di Nirmala
-              </Text>
-              <Text className="text-gray-400 text-base">
+              </AppText>
+              <AppText weight="medium" className="text-gray-400 text-lg">
                 Mulai dari satu napas
-              </Text>
+              </AppText>
             </View>
 
             {/* Content Container */}
@@ -140,20 +151,34 @@ export default function WelcomeScreen() {
                   }`}
                 >
                   {agreedToTerms && (
-                    <Text className="text-white text-xs">✓</Text>
+                    <AppText variant="body" className="text-white text-xs">
+                      ✓
+                    </AppText>
                   )}
                 </View>
-                <Text className="flex-1 text-gray-500 text-sm leading-5">
+                <AppText
+                  variant="body"
+                  weight="medium"
+                  className="flex-1 text-gray-500 leading-5"
+                >
                   Saya menyetujui{" "}
-                  <Text className="text-sage font-medium">
+                  <AppText
+                    variant="body"
+                    weight="semibold"
+                    className="text-sage"
+                  >
                     Syarat dan Ketentuan
-                  </Text>{" "}
+                  </AppText>{" "}
                   Nirmala dan memahami{" "}
-                  <Text className="text-sage font-medium">
+                  <AppText
+                    variant="body"
+                    weight="semibold"
+                    className="text-sage"
+                  >
                     Kebijakan Privasi
-                  </Text>
+                  </AppText>
                   .
-                </Text>
+                </AppText>
               </Pressable>
 
               {/* Buat Akun Button */}
@@ -164,9 +189,12 @@ export default function WelcomeScreen() {
                 onPress={handleCreateAccount}
                 disabled={!agreedToTerms}
               >
-                <Text className="text-white text-center font-semibold text-base">
+                <AppText
+                  weight="semibold"
+                  className="text-white text-center text-lg"
+                >
                   Buat akun
-                </Text>
+                </AppText>
               </TouchableOpacity>
 
               {/* Masuk Button */}
@@ -174,14 +202,17 @@ export default function WelcomeScreen() {
                 className="py-4 rounded-full bg-[#FAF3E1]"
                 onPress={handleLogin}
               >
-                <Text className="text-gray-700 text-center font-semibold text-base">
+                <AppText
+                  weight="semibold"
+                  className="text-gray-700 text-center text-lg"
+                >
                   Masuk
-                </Text>
+                </AppText>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </LinearGradient>
-    </View>
+    </SafeAreaView>
   );
 }

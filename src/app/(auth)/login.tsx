@@ -8,11 +8,15 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import NirmalaIcon from "../../../assets/icons/nirmala-icon.svg";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { StatusBar } from "expo-status-bar";
+import { AppText, AppTextInput } from "../../components/Typography";
+import GoogleIcon from "../../../assets/icons/google.svg";
 
-const Login = () => {
+export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -68,32 +72,52 @@ const Login = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-[#728c69]"
     >
-        <View className="flex-1 px-6 py-12">
-          {/* Logo */}
-          <View className="flex-row gap-2 items-center justify-center mb-8">
-            <NirmalaIcon width={36} height={36} />
-            <Text className="text-white text-2xl font-gilroy">nirmala</Text>
-          </View>
+      <StatusBar style="light" />
+      <View className="flex-1 px-6 py-12">
+        {/* Logo */}
+        <View className="flex-row gap-2 items-center justify-center mb-8">
+          <NirmalaIcon width={36} height={36} />
+          <AppText
+            variant="title"
+            weight="bold"
+            className="text-white text-2xl"
+          >
+            nirmala
+          </AppText>
+        </View>
 
-          {/* Header */}
-          <View className="mb-8">
-            <Text className="text-3xl font-bold text-white mb-3 text-center">
-              Masuk
-            </Text>
-            <Text className="text-base text-white/80 text-center">
-              Baru mengenal Nirmala?{" "}
-              <Link href="/signup">
-                <Text className="text-white font-semibold underline">
-                  Buat akun
-                </Text>
-              </Link>
-            </Text>
-          </View>
+        {/* Header */}
+        <View className="mb-4">
+          <AppText weight="bold" className="text-3xl text-white text-center">
+            Masuk
+          </AppText>
+          <AppText
+            weight="medium"
+            className="text-base text-white/80 text-center"
+          >
+            Lanjutkan perjuanganmu.
+          </AppText>
+        </View>
 
-          {/* Form */}
-          <View className="gap-4">
-            {/* Email Input */}
-            <TextInput
+        <AppText
+          weight="medium"
+          className="text-base mb-4 text-white/80 text-center"
+        >
+          Baru mengenal Nirmala?{" "}
+          <AppText
+            weight="semibold"
+            className="text-[#BCE4FE] underline"
+            onPress={() => router.replace("/(auth)/signup")}
+          >
+            Buat akun
+          </AppText>
+        </AppText>
+        {/* Form */}
+        <View className="gap-4">
+          {/* Email Input */}
+          <View>
+            <AppTextInput
+              weight="semibold"
               className={`bg-[#97AE8F] text-white px-4 py-5 rounded-lg text-base ${
                 emailError && emailTouched ? "border-2 border-red-500" : ""
               }`}
@@ -106,63 +130,73 @@ const Login = () => {
               autoCapitalize="none"
             />
             {emailError && emailTouched && (
-              <Text className="text-red-200 text-xs mt-2">{emailError}</Text>
+              <AppText weight="semibold" className="text-red-200 text-xs mt-2">
+                {emailError}
+              </AppText>
             )}
+          </View>
 
-            {/* Password Input */}
-            <View className="flex-row items-center max-h-16">
-              <TextInput
-                className="flex-1 bg-[#97AE8F] text-white rounded-l-lg px-4 py-5 text-base"
-                placeholder="Password"
-                placeholderTextColor="rgba(255, 255, 255, 1)"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity
-                className="h-full ml-2 px-4 rounded-r-lg bg-[#BDC9B9] justify-center items-center"
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? "eye" : "eye-off"}
-                  size={24}
-                  color="#728c69"
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Forgot Password */}
-            <Link href="/forgot-password">
-              <Text className="text-[#BCE4FE] text-base font-semibold text-left">
-                Lupa password kamu?
-              </Text>
-            </Link>
-
-            {/* Login Button */}
+          {/* Password Input */}
+          <View className="flex-row items-center max-h-16">
+            <AppTextInput
+              weight="semibold"
+              className="flex-1 bg-[#97AE8F] text-white rounded-r-none px-4 py-5 text-base"
+              placeholder="Password"
+              placeholderTextColor="rgba(255, 255, 255, 1)"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
             <TouchableOpacity
-              onPress={handleLogin}
-              className="bg-[#FFFCF4] rounded-full py-3 mt-12"
+              className="h-full ml-2 px-4 rounded-r-lg bg-[#BDC9B9] justify-center items-center"
+              onPress={() => setShowPassword(!showPassword)}
             >
-              <Text className="text-center text-base font-bold text-black">
-                Masuk
-              </Text>
+              <Ionicons
+                name={showPassword ? "eye" : "eye-off"}
+                size={24}
+                color="#728c69"
+              />
             </TouchableOpacity>
+          </View>
 
-            {/* Divider */}
-            <View className="flex-row items-center gap-3 my-4">
-              <View className="flex-1 h-px bg-white/30" />
-              <Text className="text-white/60 text-sm">Hubungkan akun</Text>
-              <View className="flex-1 h-px bg-white/30" />
-            </View>
+          {/* Forgot Password */}
+          <TouchableOpacity onPress={() => router.replace("/forgot-password")}>
+            <AppText
+              weight="medium"
+              className="text-[#BCE4FE] text-base text-left"
+            >
+              Lupa password
+            </AppText>
+          </TouchableOpacity>
 
-            {/* Google Login */}
-            <TouchableOpacity className="bg-[#FFFCF4] rounded-full px-12 py-3 items-center justify-center">
-              <Ionicons name="logo-google" size={24} />
+          {/* Login Button */}
+          <TouchableOpacity
+            onPress={handleLogin}
+            className="bg-[#FFFCF4] rounded-full py-3 mt-12"
+          >
+            <AppText
+              weight="bold"
+              className="text-center text-lg text-gray-700"
+            >
+              Masuk
+            </AppText>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View className="flex-row items-center gap-3 my-4">
+            <View className="flex-1 h-px bg-white/30" />
+            <AppText className="text-white/60 text-sm">Hubungkan akun</AppText>
+            <View className="flex-1 h-px bg-white/30" />
+          </View>
+
+          {/* Google Login */}
+          <View className="items-center">
+            <TouchableOpacity className="bg-[#FFFCF4] rounded-full px-10 py-3 items-center justify-center">
+              <GoogleIcon width={24} height={24}/>
             </TouchableOpacity>
           </View>
         </View>
+      </View>
     </KeyboardAvoidingView>
   );
-};
-
-export default Login;
+}

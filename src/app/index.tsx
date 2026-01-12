@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { View, Text, Dimensions } from "react-native";
+import { AppText } from "../components/Typography";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
@@ -115,16 +116,16 @@ export default function AnimatedSplashScreen() {
         {showText && (
           <View className="ml-4">
             <Animated.View style={textAnimatedStyle}>
-              <Text
+              <AppText
+                weight="bold"
                 style={{
+                  lineHeight: 52,
                   fontSize: 48,
-                  fontWeight: "bold",
                   color: "#FFFFFF",
-                  letterSpacing: 2,
                 }}
               >
                 nirmala
-              </Text>
+              </AppText>
             </Animated.View>
           </View>
         )}
