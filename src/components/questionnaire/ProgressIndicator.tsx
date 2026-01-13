@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import QuestionMark from "../../../assets/icons/ri_question-fill.svg";
+import { AppText } from "../Typography";
 
 interface ProgressIndicatorProps {
   current: number;
@@ -18,9 +19,9 @@ export const ProgressBadge: React.FC<ProgressIndicatorProps> = ({
       <View className="w-4 h-4 rounded-full items-center justify-center mr-2">
         <QuestionMark />
       </View>
-      <Text className="text-textPrimary font-semibold">
+      <AppText weight="semibold" className="text-textPrimary">
         {current} dari {total}
-      </Text>
+      </AppText>
     </View>
   );
 };

@@ -104,13 +104,13 @@ export default function ForgotPassword() {
             <View className="mb-12">
               <AppText
                 weight="bold"
-                className="text-3xl mb-3 text-white text-center"
+                className="text-3xl mb-3 text-white text-start"
               >
                 Tenang. Kami bantu.
               </AppText>
               <AppText
                 weight="medium"
-                className="text-base text-white/80 text-center"
+                className="text-base text-white/80 text-start"
               >
                 Masukkan email yang terhubung dengan akun Nirmala.
               </AppText>
@@ -161,11 +161,11 @@ export default function ForgotPassword() {
             </TouchableOpacity>
           </View>
         </View>
+      </KeyboardAvoidingView>
         <Image
           source={require("../../../assets/mascot.png")}
           className="absolute z-10 bottom-0 left-0 right-0"
         />
-      </KeyboardAvoidingView>
     </>
   );
 }

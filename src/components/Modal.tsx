@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, View, TouchableOpacity } from "react-native";
+import { Modal, View, TouchableOpacity, ActivityIndicator } from "react-native";
 import { AppText } from "./Typography";
 
 interface BaseModalProps {
@@ -87,6 +87,34 @@ export function AlertModal({
             {buttonLabel}
           </AppText>
         </TouchableOpacity>
+      </ModalCard>
+    </BaseModal>
+  );
+}
+
+interface LoadingModalProps {
+  visible: boolean;
+  message?: string;
+}
+
+export function LoadingModal({
+  visible,
+  message = "Menyiapkan tujuanmu..",
+}: LoadingModalProps) {
+  return (
+    <BaseModal visible={visible}>
+      <ModalCard>
+        <View className="items-center py-4">
+          <View className="mb-6">
+            <ActivityIndicator size="large" color="#93C5FD" />
+          </View>
+          <AppText
+            weight="semibold"
+            className="text-lg text-gray-800 text-center"
+          >
+            {message}
+          </AppText>
+        </View>
       </ModalCard>
     </BaseModal>
   );

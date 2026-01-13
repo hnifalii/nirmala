@@ -243,7 +243,9 @@ export default function SignUp() {
               onBlur={handleFullNameBlur}
             />
             {fullNameError && fullNameTouched && (
-              <Text className="text-red-200 text-xs mt-1">{fullNameError}</Text>
+              <AppText className="text-red-200 text-xs mt-1">
+                {fullNameError}
+              </AppText>
             )}
           </View>
 
@@ -263,7 +265,9 @@ export default function SignUp() {
               autoCapitalize="none"
             />
             {emailError && emailTouched && (
-              <Text className="text-red-200 text-xs mt-1">{emailError}</Text>
+              <AppText className="text-red-200 text-xs mt-1">
+                {emailError}
+              </AppText>
             )}
           </View>
 
@@ -296,7 +300,9 @@ export default function SignUp() {
               </TouchableOpacity>
             </View>
             {passwordError && passwordTouched && (
-              <Text className="text-red-200 text-xs mt-1">{passwordError}</Text>
+              <AppText className="text-red-200 text-xs mt-1">
+                {passwordError}
+              </AppText>
             )}
           </View>
 
@@ -329,9 +335,9 @@ export default function SignUp() {
               </TouchableOpacity>
             </View>
             {confirmPasswordError && confirmPasswordTouched && (
-              <Text className="text-red-200 text-xs mt-1">
+              <AppText className="text-red-200 text-xs mt-1">
                 {confirmPasswordError}
-              </Text>
+              </AppText>
             )}
           </View>
 
@@ -360,7 +366,7 @@ export default function SignUp() {
           {/* Google SignUp */}
           <View className="items-center">
             <TouchableOpacity className="bg-[#FFFCF4] rounded-full px-10 py-3 items-center justify-center">
-              <GoogleIcon width={24} height={24}/>
+              <GoogleIcon width={24} height={24} />
             </TouchableOpacity>
           </View>
         </View>

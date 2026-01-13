@@ -1,6 +1,7 @@
 import React from "react";
 import { TouchableOpacity, Text } from "react-native";
 import { QuestionOption } from "../../types/questionnaire";
+import { AppText } from "../Typography";
 
 interface OptionCardProps {
   option: QuestionOption;
@@ -23,13 +24,14 @@ export const OptionCard: React.FC<OptionCardProps> = ({
       onPress={() => onSelect(option.id)}
       activeOpacity={0.7}
     >
-      <Text
+      <AppText
+        weight="semibold"
         className={`text-base ${
           isSelected ? "text-textPrimary font-semibold" : "text-textPrimary font-semibold"
         }`}
       >
         {option.text}
-      </Text>
+      </AppText>
     </TouchableOpacity>
   );
 };

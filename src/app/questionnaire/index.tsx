@@ -19,6 +19,7 @@ import { QuestionnaireAnswer } from "../../types/questionnaire";
 import CloudIcon from "../../../assets/icons/cloud-shadow.svg";
 import HeaderQuestion from "../../../assets/icons/header-quest.svg";
 import ArrowLeft from "../../../assets/icons/arrow-left.svg";
+import { AppText } from "../../components/Typography";
 
 const { height, width } = Dimensions.get("window");
 
@@ -62,7 +63,7 @@ export default function QuestionnaireScreen() {
       // Questionnaire completed, navigate to home
       // TODO: Save answers to backend/storage
       console.log("Questionnaire completed:", updatedAnswers);
-      router.replace("/(app)");
+      router.replace("/questionnaire/after-questionnaire");
     } else {
       // Go to next question
       setCurrentIndex(currentIndex + 1);
@@ -118,9 +119,9 @@ export default function QuestionnaireScreen() {
           </View>
 
           {/* Question Text */}
-          <Text className="text-white text-2xl font-bold text-center leading-8 mb-6">
+          <AppText weight="bold" className="text-white text-2xl text-center leading-8 mb-6">
             {currentQuestion.text}
-          </Text>
+          </AppText>
 
           {/* Cloud decoration */}
           <View className="absolute" style={{ left: 20, bottom: 20 }}>
@@ -172,9 +173,9 @@ export default function QuestionnaireScreen() {
               onPress={handleNext}
               disabled={!selectedOption}
             >
-              <Text className="text-white text-center font-semibold text-base">
+              <AppText weight="semibold" className="text-white text-center text-base">
                 {isLastQuestion ? "Selesai" : "Selanjutnya"}
-              </Text>
+              </AppText>
             </TouchableOpacity>
           </View>
         </View>

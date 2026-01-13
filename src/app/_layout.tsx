@@ -47,11 +47,9 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="welcome/index" />
         <Stack.Screen name="questionnaire/index" />
-        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(auth)" options={{ animation: "none" }} />
         <Stack.Screen name="(app)/index" />
       </Stack>
     </>
   );
-};
-
-export default RootLayout;
+}
