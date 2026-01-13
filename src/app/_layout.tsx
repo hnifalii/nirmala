@@ -52,6 +52,4 @@ export default function RootLayout() {
       </Stack>
     </>
   );
-};
-
-export default RootLayout;
+}

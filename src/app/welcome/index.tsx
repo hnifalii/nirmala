@@ -10,13 +10,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
-import NirmalaIconDark from "../../assets/icons/nirmala-icon-dark.svg";
-import WelcomeIcon from "../../assets/icons/welcome-icon.svg";
-import CloudIcon from "../../assets/icons/noto-v1_cloud.svg";
-import XIcon from "../../assets/icons/x.svg";
-import ParuIcon from "../../assets/icons/paru.svg";
-import WhiteStar from "../../assets/icons/whitestar.svg";
-import GreenStar from "../../assets/icons/green-star.svg";
+import NirmalaIconDark from "../../../assets/icons/nirmala-icon-dark.svg";
+import WelcomeIcon from "../../../assets/icons/welcome-icon.svg";
+import CloudIcon from "../../../assets/icons/noto-v1_cloud.svg";
+import XIcon from "../../../assets/icons/x.svg";
+import ParuIcon from "../../../assets/icons/paru.svg";
+import WhiteStar from "../../../assets/icons/whitestar.svg";
+import GreenStar from "../../../assets/icons/green-star.svg";
 import { AppText } from "../../components/Typography";
 
 const { height, width } = Dimensions.get("window");
@@ -41,7 +41,9 @@ export default function WelcomeScreen() {
 
       <TouchableOpacity
         className="absolute top-10 right-6 z-20"
-        onPress={() => { router.push("/home"); }}
+        onPress={() => {
+          router.push("/home");
+        }}
       >
         <AppText className="text-white text-base">Lewati</AppText>
       </TouchableOpacity>
