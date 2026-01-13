@@ -156,7 +156,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="kamu"
+        name="profile"
         options={{
           tabBarLabel: "Kamu",
           tabBarIcon: ({ size, focused }) =>
