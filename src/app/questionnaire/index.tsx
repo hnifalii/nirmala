@@ -9,6 +9,7 @@ import {
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
 import {
   ProgressBadge,
   CircularProgress,
@@ -108,7 +109,7 @@ export default function QuestionnaireScreen() {
                 setSelectedOption(prevAnswer?.selectedOptionId || null);
               }}
             >
-              <ArrowLeft width={30} height={30} /> 
+              <ArrowLeft width={30} height={30} />
             </TouchableOpacity>
           )}
 
@@ -117,10 +118,16 @@ export default function QuestionnaireScreen() {
             <ProgressBadge current={currentIndex + 1} total={totalQuestions} />
           </View>
 
-          {/* Question Text */}
-          <Text className="text-white text-2xl font-bold text-center leading-8 mb-6">
-            {currentQuestion.text}
-          </Text>
+          {/* Question Text with Animation */}
+          <Animated.View
+            key={`question-${currentIndex}`}
+            entering={FadeInUp.duration(600).springify()}
+            className="mb-6"
+          >
+            <Text className="text-white text-2xl font-bold text-center leading-8">
+              {currentQuestion.text}
+            </Text>
+          </Animated.View>
 
           {/* Cloud decoration */}
           <View className="absolute" style={{ left: 20, bottom: 20 }}>
@@ -151,16 +158,21 @@ export default function QuestionnaireScreen() {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ flexGrow: 1 }}
             >
-              {/* Options */}
+              {/* Options with Animation */}
               <View className="mb-6">
-                {currentQuestion.options.map((option) => (
-                  <OptionCard
-                    key={option.id}
-                    option={option}
-                    isSelected={selectedOption === option.id}
-                    onSelect={handleSelectOption}
-                  />
-                ))}
+                <Animated.View
+                  key={`options-${currentIndex}`}
+                  entering={FadeInUp.delay(200).duration(600).springify()}
+                >
+                  {currentQuestion.options.map((option) => (
+                    <OptionCard
+                      key={option.id}
+                      option={option}
+                      isSelected={selectedOption === option.id}
+                      onSelect={handleSelectOption}
+                    />
+                  ))}
+                </Animated.View>
               </View>
             </ScrollView>
 

@@ -4,11 +4,17 @@ import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import NirmalaIcon from "../../../assets/icons/nirmala-icon.svg";
 import HomeIcon from "../../../assets/icons/streamline-plump_home-1-solid.svg";
 import HomeOutlineIcon from "../../../assets/icons/streamline-plump_home-1-outline.svg";
+import CelenganIcon from "../../../assets/icons/bottom-celengan.svg";
+import CelenganOutlineIcon from "../../../assets/icons/bottom-celengan-outline.svg";
+import PolaIcon from "../../../assets/icons/bottom-pola.svg";
+import ProfilIcon from "../../../assets/icons/bottom-profile.svg";
+import ProfilOutlineIcon from "../../../assets/icons/bottom-profile-outline.svg";
+import MainIcon from "../../../assets/icons/bottom-main.svg";
 
 const CustomTabBarButton = ({ children, onPress }: any) => (
   <TouchableOpacity
     style={{
-      top: -40, // Move it higher to match the design (floating)
+      top: -60, // Move it higher to match the design (floating)
       justifyContent: "center",
       alignItems: "center",
       ...styles.shadow,
@@ -26,12 +32,12 @@ const CustomTabBarButton = ({ children, onPress }: any) => (
         // Glow effect
         shadowColor: "#FBA359",
         shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.6,
-        shadowRadius: 10,
-        elevation: 10,
+        shadowOpacity: 0.8,
+        shadowRadius: 15,
+        elevation: 15,
       }}
     >
-      <NirmalaIcon width={40} height={40} color="white" />
+      <MainIcon width={50} height={50} color="white" />
     </View>
   </TouchableOpacity>
 );
@@ -72,7 +78,7 @@ export default function AppLayout() {
           borderRadius: 15,
           height: 100,
           paddingTop: 25,
-          paddingBottom: 0, // push labels up slightly
+          paddingBottom: 40, // push labels up slightly
           ...styles.shadow,
         },
         tabBarLabelStyle: {
@@ -105,15 +111,20 @@ export default function AppLayout() {
         name="celengan"
         options={{
           tabBarLabel: "Celengan",
-          tabBarIcon: ({ size, focused }) => (
-            <TabIconContainer focused={focused}>
-              <MaterialCommunityIcons
-                name="piggy-bank-outline"
-                size={size}
-                color="#587B56"
-              />
-            </TabIconContainer>
-          ),
+          tabBarIcon: ({ size, focused }) =>
+            focused ? (
+              <TabIconContainer focused={true}>
+                <CelenganOutlineIcon
+                  width={size}
+                  height={size}
+                  color="#587B56"
+                />
+              </TabIconContainer>
+            ) : (
+              <TabIconContainer focused={false}>
+                <CelenganIcon width={size} height={size} color="#587B56" />
+              </TabIconContainer>
+            ),
         }}
       />
       <Tabs.Screen
@@ -139,11 +150,7 @@ export default function AppLayout() {
           tabBarLabel: "Pola",
           tabBarIcon: ({ size, focused }) => (
             <TabIconContainer focused={focused}>
-              <MaterialCommunityIcons
-                name="air-filter"
-                size={size}
-                color="#587B56"
-              />
+              <PolaIcon width={size} height={size} color="#587B56" />
             </TabIconContainer>
           ),
         }}
@@ -152,11 +159,16 @@ export default function AppLayout() {
         name="kamu"
         options={{
           tabBarLabel: "Kamu",
-          tabBarIcon: ({ size, focused }) => (
-            <TabIconContainer focused={focused}>
-              <Feather name="user" size={size} color="#587B56" />
-            </TabIconContainer>
-          ),
+          tabBarIcon: ({ size, focused }) =>
+            focused ? (
+              <TabIconContainer focused={true}>
+                <ProfilOutlineIcon width={size} height={size} color="#587B56" />
+              </TabIconContainer>
+            ) : (
+              <TabIconContainer focused={false}>
+                <ProfilIcon width={size} height={size} color="#587B56" />
+              </TabIconContainer>
+            ),
         }}
       />
     </Tabs>
