@@ -10,17 +10,7 @@ import {
 
 type Variant = "title" | "subtitle" | "body" | "caption" | "label";
 
-type Weight =
-  | "ultralight"
-  | "thin"
-  | "light"
-  | "regular"
-  | "medium"
-  | "semibold"
-  | "bold"
-  | "extrabold"
-  | "heavy"
-  | "black";
+type Weight = "regular" | "medium" | "bold";
 
 interface AppTextProps extends RNTextProps {
   variant?: Variant;
@@ -31,16 +21,9 @@ interface AppTextProps extends RNTextProps {
 }
 
 const fontFamilies: Record<Weight, string> = {
-  ultralight: "Gilroy-UltraLight",
-  thin: "Gilroy-Thin",
-  light: "Gilroy-Light",
-  regular: "Gilroy-Regular",
-  medium: "Gilroy-Medium",
-  semibold: "Gilroy-SemiBold",
-  bold: "Gilroy-Bold",
-  extrabold: "Gilroy-ExtraBold",
-  heavy: "Gilroy-Heavy",
-  black: "Gilroy-Black",
+  regular: "Apercu-Regular",
+  medium: "Apercu-Medium",
+  bold: "Apercu-Bold",
 };
 
 const variantStyles: Record<Variant, TextStyle> = {
@@ -87,11 +70,7 @@ export function Title(props: Omit<AppTextProps, "variant">) {
 
 export function Subtitle(props: Omit<AppTextProps, "variant">) {
   return (
-    <AppText
-      {...props}
-      variant="subtitle"
-      weight={props.weight ?? "semibold"}
-    />
+    <AppText {...props} variant="subtitle" weight={props.weight ?? "medium"} />
   );
 }
 
