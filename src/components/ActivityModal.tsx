@@ -15,42 +15,123 @@ import { Activity } from "../types/activities";
 const { height, width } = Dimensions.get("window");
 
 // Rainbow/Sunset SVG Component
-const RainbowIllustration = () => (
-  <View className="items-center justify-center" style={{ height: 160 }}>
-    <View className="relative" style={{ width: 200, height: 160 }}>
-      {/* Outer yellow circle */}
+const RainbowIllustration = () => {
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Synchronized pulse animation for all circles
+    Animated.loop(
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.08,
+            duration: 2500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 2500,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(translateY, {
+            toValue: 1,
+            duration: 2500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(translateY, {
+            toValue: 0,
+            duration: 2500,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]),
+    ).start();
+  }, [pulseAnim, translateY]);
+
+  // Create different scale values with varying strengths
+  const outerScale = pulseAnim.interpolate({
+    inputRange: [1, 1.08],
+    outputRange: [1, 1.08], // Most movement - outer is most powerful
+  });
+
+  const middleScale = pulseAnim.interpolate({
+    inputRange: [1, 1.08],
+    outputRange: [1, 1.04], // Medium movement
+  });
+
+  const innerScale = pulseAnim.interpolate({
+    inputRange: [1, 1.08],
+    outputRange: [1, 1.03], // Least movement
+  });
+
+  // Create different translateY values with varying strengths
+  const outerTranslateY = translateY.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -20], // Most movement - outer is most powerful
+  });
+
+  const middleTranslateY = translateY.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -12], // Medium movement
+  });
+
+  const innerTranslateY = translateY.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -8], // Least movement
+  });
+
+  return (
+    <View
+      className="items-center justify-end"
+      style={{ height: 300, width: width, overflow: "hidden" }}
+    >
       <View
-        className="absolute bg-yellow-200 rounded-full"
-        style={{
-          width: 200,
-          height: 200,
-          bottom: 0,
-          left: 0,
-        }}
-      />
-      {/* Middle yellow circle */}
-      <View
-        className="absolute bg-yellow-300 rounded-full"
-        style={{
-          width: 150,
-          height: 150,
-          bottom: 0,
-          left: 25,
-        }}
-      />
-      {/* Inner orange/salmon circle */}
-      <View
-        className="absolute bg-orange-300 rounded-full"
-        style={{
-          width: 100,
-          height: 100,
-          bottom: 0,
-          left: 50,
-        }}
-      />
+        className="relative items-center"
+        style={{ width: width, height: 300 }}
+      >
+        {/* Outer beige/cream circle */}
+        <Animated.View
+          className="absolute rounded-full"
+          style={{
+            width: width * 1.2,
+            height: width * 1.2,
+            bottom: -width * 0.6, // Half hidden below screen
+            backgroundColor: "#F5E6D3",
+            transform: [{ scale: outerScale }, { translateY: outerTranslateY }],
+          }}
+        />
+        {/* Middle yellow circle */}
+        <Animated.View
+          className="absolute rounded-full"
+          style={{
+            width: width * 0.9,
+            height: width * 0.9,
+            bottom: -width * 0.45,
+            backgroundColor: "#F4D58D",
+            transform: [
+              { scale: middleScale },
+              { translateY: middleTranslateY },
+            ],
+          }}
+        />
+        {/* Inner salmon/peach circle */}
+        <Animated.View
+          className="absolute rounded-full"
+          style={{
+            width: width * 0.6,
+            height: width * 0.6,
+            bottom: -width * 0.3,
+            backgroundColor: "#F5A18D",
+            transform: [{ scale: innerScale }, { translateY: innerTranslateY }],
+          }}
+        />
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 // Activity Modal Component
 export const ActivityModal = ({
@@ -209,16 +290,16 @@ export const ActivityModal = ({
                   {section.title}
                 </AppText>
                 {section.buttons && (
-                  <View className="w-full gap-3">
+                  <View className="gap-3">
                     {section.buttons.map((button, index) => (
                       <TouchableOpacity
                         key={index}
-                        className="bg-white/20 py-3 px-6 rounded-full border border-white/40"
+                        className={`${index < 1 ? "bg-cream" : "active:bg-cream"} py-3 px-6 rounded-full`}
                         onPress={() => handleButtonClick(button.action)}
                       >
                         <AppText
                           weight="semibold"
-                          className="text-white text-center"
+                          className={`${index < 1 ? "text-gray-700" : "text-cream"} text-center`}
                         >
                           {button.label}
                         </AppText>
@@ -238,16 +319,16 @@ export const ActivityModal = ({
                   {section.title}
                 </AppText>
                 {section.buttons && (
-                  <View className="w-full gap-3">
+                  <View className="gap-3">
                     {section.buttons.map((button, index) => (
                       <TouchableOpacity
                         key={index}
-                        className="bg-white py-3 px-6 rounded-full"
+                        className={`${index < 1 ? "bg-cream" : "active:bg-cream"} py-3 px-6 rounded-full`}
                         onPress={() => handleButtonClick(button.action)}
                       >
                         <AppText
                           weight="semibold"
-                          className="text-blue-500 text-center"
+                          className={`${index < 1 ? "text-gray-700" : "text-cream"} text-center`}
                         >
                           {button.label}
                         </AppText>
@@ -267,16 +348,16 @@ export const ActivityModal = ({
                   {section.title}
                 </AppText>
                 {section.buttons && (
-                  <View className="w-full gap-3">
+                  <View className="gap-3">
                     {section.buttons.map((button, index) => (
                       <TouchableOpacity
                         key={index}
-                        className="bg-white py-3 px-6 rounded-full"
+                        className={`${index < 1 ? "bg-cream" : "active:bg-cream"} py-3 px-6 rounded-full`}
                         onPress={() => handleButtonClick(button.action)}
                       >
                         <AppText
                           weight="semibold"
-                          className="text-blue-500 text-center"
+                          className={`${index < 1 ? "text-gray-700" : "text-cream"} text-center`}
                         >
                           {button.label}
                         </AppText>
@@ -291,7 +372,7 @@ export const ActivityModal = ({
           {/* Rainbow Illustration at Bottom */}
           <View
             className="absolute bottom-0 left-0 right-0 w-full items-center"
-            style={{ height: 200 }}
+            style={{ height: 300, overflow: "hidden" }}
           >
             <RainbowIllustration />
           </View>

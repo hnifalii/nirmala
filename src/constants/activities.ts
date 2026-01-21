@@ -94,6 +94,11 @@ export const ACTIVITIES: Activity[] = [
         helperText: "Selesai",
       },
       {
+        type: "action",
+        duration: 5000,
+        subtitle: "Menahan sejenak dan bernapas adalah langkah yang berarti.",
+      },
+      {
         type: "end",
         duration: 0,
         title: "Bagaimana rasanya sekarang?",
@@ -113,7 +118,7 @@ export const ACTIVITIES: Activity[] = [
         duration: 0,
         title: "Oke, kami bantu pelan pelan...",
         buttons: [
-          { label: "Lanjutkan jeda sebentar", action: "retry" },
+          { label: "Ulangi aktivitas", action: "retry" },
           { label: "Kembali ke Halaman", action: "home" },
         ],
       },
