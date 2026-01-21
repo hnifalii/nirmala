@@ -27,6 +27,21 @@ export const ProgressBadge: React.FC<ProgressIndicatorProps> = ({
 };
 
 // Circular Progress component
+import Animated, {
+  useAnimatedProps,
+  useSharedValue,
+  withTiming,
+  withDelay,
+  Easing,
+  useDerivedValue,
+  runOnJS,
+} from "react-native-reanimated";
+import { useEffect, useState } from "react";
+import { TextInput } from "react-native";
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedText = Animated.createAnimatedComponent(TextInput); // Using TextInput for number animation hack or just Text key
+
 export const CircularProgress: React.FC<ProgressIndicatorProps> = ({
   current,
   total,
@@ -35,7 +50,40 @@ export const CircularProgress: React.FC<ProgressIndicatorProps> = ({
   const strokeWidth = 4;
   const radius = 35;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - progress);
+
+  // State to hold the displayed number
+  const [displayValue, setDisplayValue] = useState(current);
+
+  // Shared values
+  const animatedProgress = useSharedValue(0);
+  const animatedNumber = useSharedValue(0);
+
+  useEffect(() => {
+    // Animate progress
+    animatedProgress.value = withTiming(progress, {
+      duration: 800,
+      easing: Easing.out(Easing.exp),
+    });
+
+    // Animate number
+    animatedNumber.value = withTiming(current, {
+      duration: 800,
+      easing: Easing.out(Easing.exp),
+    });
+  }, [current, progress]);
+
+  const animatedProps = useAnimatedProps(() => {
+    const strokeDashoffset = circumference * (1 - animatedProgress.value);
+    return {
+      strokeDashoffset,
+    };
+  });
+
+  // Derived value to update the state
+  useDerivedValue(() => {
+    const val = Math.round(animatedNumber.value);
+    runOnJS(setDisplayValue)(val);
+  });
 
   return (
     <View className="items-center justify-center bg-cream border-4 border-sage rounded-full p-px shadow-md">
@@ -50,7 +98,7 @@ export const CircularProgress: React.FC<ProgressIndicatorProps> = ({
           fill="#FFFCF4"
         />
         {/* Progress Circle */}
-        <Circle
+        <AnimatedCircle
           cx={45}
           cy={45}
           r={radius}
@@ -58,14 +106,14 @@ export const CircularProgress: React.FC<ProgressIndicatorProps> = ({
           strokeWidth={strokeWidth}
           fill="transparent"
           strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
+          animatedProps={animatedProps}
           strokeLinecap="round"
           transform={`rotate(-90, 45, 45)`}
         />
       </Svg>
       {/* Number in center */}
       <View className="absolute items-center justify-center">
-        <Text className="text-3xl font-bold text-dark">{current}</Text>
+        <Text className="text-3xl font-bold text-dark">{displayValue}</Text>
       </View>
     </View>
   );
