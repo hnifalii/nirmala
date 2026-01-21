@@ -39,14 +39,14 @@ export default function WelcomeScreen() {
     <SafeAreaView className="flex-1" edges={["bottom"]}>
       <StatusBar style="light" />
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         className="absolute top-10 right-6 z-20"
         onPress={() => {
           router.replace("/questionnaire/after-questionnaire");
         }}
       >
         <AppText className="text-white text-base">Lewati</AppText>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <LinearGradient
         colors={["#728C69", "#728C69", "#FFE884"]}
         locations={[0, 0.2, 1]}
