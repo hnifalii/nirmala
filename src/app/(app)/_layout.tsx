@@ -113,16 +113,16 @@ export default function AppLayout() {
           tabBarLabel: "Celengan",
           tabBarIcon: ({ size, focused }) =>
             focused ? (
-              <TabIconContainer focused={true}>
+              <TabIconContainer focused={focused}>
+                <CelenganIcon width={size} height={size} color="#587B56" />
+              </TabIconContainer>
+            ) : (
+              <TabIconContainer focused={focused}>
                 <CelenganOutlineIcon
                   width={size}
                   height={size}
                   color="#587B56"
                 />
-              </TabIconContainer>
-            ) : (
-              <TabIconContainer focused={false}>
-                <CelenganIcon width={size} height={size} color="#587B56" />
               </TabIconContainer>
             ),
         }}
@@ -156,7 +156,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="kamu"
         options={{
           tabBarLabel: "Kamu",
           tabBarIcon: ({ size, focused }) =>
