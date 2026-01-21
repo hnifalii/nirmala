@@ -26,6 +26,8 @@ import SmartphoneIcon from "../../../assets/icons/smartphone.svg";
 import ShoeIcon from "../../../assets/icons/shoe.svg";
 import TicketIcon from "../../../assets/icons/ticket.svg";
 import PlantIcon from "../../../assets/icons/plant.svg";
+import { auth, db } from "../../../firebase";
+import { doc, updateDoc } from "firebase/firestore";
 
 const { height, width } = Dimensions.get("window");
 
@@ -63,7 +65,7 @@ const AnimatedButton = ({ goal, isSelected, onPress, colors }: any) => {
   const handlePress = () => {
     scale.value = withSequence(
       withTiming(0.95, { duration: 50 }),
-      withSpring(1, { damping: 100, stiffness: 200 })
+      withSpring(1, { damping: 100, stiffness: 200 }),
     );
     onPress(goal.id);
   };
@@ -115,13 +117,13 @@ export default function AfterQuestionnaireScreen() {
       "keyboardDidShow",
       () => {
         setKeyboardVisible(true);
-      }
+      },
     );
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
       () => {
         setKeyboardVisible(false);
-      }
+      },
     );
 
     return () => {
@@ -193,17 +195,30 @@ export default function AfterQuestionnaireScreen() {
     });
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (selectedGoals.length === 0) return;
     setIsLoading(true);
-    // TODO: Save the selected goals to storage/backend
     console.log("Selected goals:", selectedGoals);
 
-    // Simulate loading and navigate
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      await updateDoc(doc(db, "users", user.uid), {
+        savingsGoal: {
+          name: selectedGoals.join(', '),
+          isDone: false,
+          target: 0,
+          current: 0,
+        },
+      });
+
       router.push("/questionnaire/goal-amount");
-    }, 2000);
+    } catch (err) {
+      console.error("error save goal " + err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleOther = () => {
@@ -216,17 +231,30 @@ export default function AfterQuestionnaireScreen() {
     setCustomGoal("");
   };
 
-  const handleSaveCustomGoal = () => {
+  const handleSaveCustomGoal = async () => {
     if (customGoal.trim()) {
       setIsLoading(true);
       console.log("Custom goal:", customGoal);
-      // TODO: Save the custom goal to storage/backend
 
-      // Simulate loading and navigate
-      setTimeout(() => {
-        setIsLoading(false);
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        await updateDoc(doc(db, "users", user.uid), {
+          savingsGoal: {
+            name: customGoal,
+            isDone: false,
+            target: 0,
+            current: 0,
+          },
+        });
+
         router.push("/questionnaire/goal-amount");
-      }, 2000);
+      } catch (err) {
+        console.error("error save goal " + err);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 

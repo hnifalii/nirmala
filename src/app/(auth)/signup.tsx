@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,16 @@ import NirmalaIcon from "../../../assets/icons/nirmala-icon.svg";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { AppText, AppTextInput } from "../../components/Typography";
 import GoogleIcon from "../../../assets/icons/google.svg";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithCredential,
+  updateProfile,
+} from "firebase/auth";
+import { auth, db } from "../../../firebase";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
+import { UserInitialData } from "../../types/user";
 
 export default function SignUp() {
   const router = useRouter();
@@ -30,6 +40,14 @@ export default function SignUp() {
   const [fullNameTouched, setFullNameTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        "467863551925-matcan7uqvgp4t370jus0e0u4tt39feu.apps.googleusercontent.com",
+    });
+  });
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -136,7 +154,7 @@ export default function SignUp() {
     }
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     // Trigger all validations
     setFullNameTouched(true);
     setEmailTouched(true);
@@ -179,6 +197,105 @@ export default function SignUp() {
     }
 
     console.log("SignUp pressed", { fullName, email, password });
+
+    setLoading(true);
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const user = userCredential.user;
+
+      await updateProfile(user, { displayName: fullName });
+
+      const initialData: UserInitialData = {
+        uid: user.uid,
+        fullName: fullName,
+        email: user.email,
+        joinedAt: serverTimestamp(),
+        isOnboardingCompleted: false,
+        stats: {
+          currentStreak: 0,
+          totalMoneySaved: 0,
+          healthProgress: 0,
+          lastRelapse: null,
+          totalCigarettesAvoided: 0,
+        },
+      };
+
+      await setDoc(doc(db, "users", user.uid), initialData);
+
+      router.replace("/questionnaire");
+    } catch (err) {
+      console.error("error sign up " + err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGooGleSignUp = async () => {
+    setLoading(true);
+
+    try {
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
+      const signInResult = await GoogleSignin.signIn();
+      const idToken = signInResult.data?.idToken;
+
+      if (!idToken) {
+        throw new Error("Google ID token not found");
+      }
+
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+
+      const userCredential = await signInWithCredential(auth, googleCredential);
+      const user = userCredential.user;
+
+      // check if user document exists
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+
+        if (userData.isOnboardingCompleted) {
+          router.replace("/(app)");
+        } else {
+          router.replace("/questionnaire");
+        }
+      } else {
+        const initialData: UserInitialData = {
+          uid: user.uid,
+          fullName: fullName,
+          email: user.email,
+          joinedAt: serverTimestamp(),
+          isOnboardingCompleted: false,
+          stats: {
+            currentStreak: 0,
+            totalMoneySaved: 0,
+            healthProgress: 0,
+            lastRelapse: null,
+            totalCigarettesAvoided: 0,
+          },
+        };
+
+        await setDoc(userDocRef, initialData);
+
+        router.replace("/questionnaire");
+      }
+    } catch (err: any) {
+      if (err.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('user cancelled login');
+      } else {
+        console.error("error sign up google " + err);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -344,6 +461,7 @@ export default function SignUp() {
           {/* SignUp Button */}
           <View className="pt-6">
             <TouchableOpacity
+              disabled={loading}
               onPress={handleSignUp}
               className="bg-[#FFFCF4] rounded-full py-3"
             >
@@ -365,7 +483,11 @@ export default function SignUp() {
 
           {/* Google SignUp */}
           <View className="items-center">
-            <TouchableOpacity className="bg-[#FFFCF4] rounded-full px-10 py-3 items-center justify-center">
+            <TouchableOpacity
+              disabled={loading}
+              onPress={handleGooGleSignUp}
+              className="bg-[#FFFCF4] rounded-full px-10 py-3 items-center justify-center"
+            >
               <GoogleIcon width={24} height={24} />
             </TouchableOpacity>
           </View>

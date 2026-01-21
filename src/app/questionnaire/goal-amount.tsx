@@ -14,6 +14,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { AppText, AppTextInput } from "../../components/Typography";
 import PiggyIcon from "../../../assets/icons/piggy-bank.svg";
 import CloudIcon from "../../../assets/icons/cloud-shadow.svg";
+import { auth, db } from "../../../firebase";
+import { doc, updateDoc } from "firebase/firestore";
 
 const { height, width } = Dimensions.get("window");
 
@@ -21,19 +23,20 @@ export default function GoalAmountScreen() {
   const router = useRouter();
   const [amount, setAmount] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
         setKeyboardVisible(true);
-      }
+      },
     );
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
       () => {
         setKeyboardVisible(false);
-      }
+      },
     );
 
     return () => {
@@ -42,11 +45,29 @@ export default function GoalAmountScreen() {
     };
   }, []);
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     if (!amount.trim()) return;
     console.log("Goal amount:", amount);
-    // TODO: Save the goal amount to storage/backend
-    router.replace("/(app)");
+
+    setLoading(true);
+
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      await updateDoc(doc(db, "users", user.uid), {
+        savingsGoal: {
+          target: parseInt(amount),
+        },
+        isOnboardingCompleted: true,
+      });
+
+      router.replace("/(app)");
+    } catch (err) {
+      console.error("error save goal amount " + err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatCurrency = (value: string) => {
@@ -110,7 +131,7 @@ export default function GoalAmountScreen() {
           {/* Finish Button */}
           <View className="items-center mt-8">
             <TouchableOpacity
-              disabled={!amount.trim()}
+              disabled={!amount.trim() || loading}
               className={`py-4 px-12 bg-sky rounded-full ${
                 amount.trim() ? "" : "opacity-50"
               }`}

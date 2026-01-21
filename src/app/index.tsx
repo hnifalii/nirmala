@@ -16,6 +16,9 @@ import Animated, {
 } from "react-native-reanimated";
 
 import NirmalaIcon from "../../assets/icons/nirmala-icon.svg";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase";
 
 const { width } = Dimensions.get("window");
 
@@ -30,7 +33,26 @@ export default function AnimatedSplashScreen() {
   const goNext = () => {
     if (!hasNavigated.current) {
       hasNavigated.current = true;
-      router.replace("/welcome");
+
+      const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        if (currentUser) {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+
+            if (userData.isOnboardingCompleted) {
+              router.replace("/(app)");
+            } else {
+              router.replace("/questionnaire");
+            }
+          } else {
+            router.replace("/welcome");
+          }
+        }
+      });
+
+      return unsubscribe;
     }
   };
 

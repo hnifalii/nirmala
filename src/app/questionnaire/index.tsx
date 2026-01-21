@@ -21,6 +21,8 @@ import CloudIcon from "../../../assets/icons/cloud-shadow.svg";
 import HeaderQuestion from "../../../assets/icons/header-quest.svg";
 import ArrowLeft from "../../../assets/icons/arrow-left.svg";
 import { AppText } from "../../components/Typography";
+import { auth, db } from "../../../firebase";
+import { doc, updateDoc } from "firebase/firestore";
 
 const { height, width } = Dimensions.get("window");
 
@@ -29,6 +31,7 @@ export default function QuestionnaireScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuestionnaireAnswer[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const currentQuestion = QUESTIONNAIRE_QUESTIONS[currentIndex];
   const totalQuestions = QUESTIONNAIRE_QUESTIONS.length;
@@ -38,13 +41,15 @@ export default function QuestionnaireScreen() {
     setSelectedOption(optionId);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!selectedOption) return;
 
     // Save current answer
     const newAnswer: QuestionnaireAnswer = {
       questionId: currentQuestion.id,
+      questionText: currentQuestion.text,
       selectedOptionId: selectedOption,
+      selectedOptionText: currentQuestion.options.find((q) => q.id === selectedOption)?.text || '',
     };
 
     const updatedAnswers = [...answers];
@@ -64,7 +69,24 @@ export default function QuestionnaireScreen() {
       // Questionnaire completed, navigate to home
       // TODO: Save answers to backend/storage
       console.log("Questionnaire completed:", updatedAnswers);
-      router.replace("/questionnaire/after-questionnaire");
+      
+      setLoading(true);
+      
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        
+        await updateDoc(doc(db, 'users', user.uid), {
+          smokingHabit: updatedAnswers,
+        });
+
+        router.replace("/questionnaire/after-questionnaire");
+      
+      } catch (err) {
+        console.error('error questionnaire ' + err);
+      } finally {
+        setLoading(false);
+      }
     } else {
       // Go to next question
       setCurrentIndex(currentIndex + 1);

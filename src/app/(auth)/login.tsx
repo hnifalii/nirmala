@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,18 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 import { AppText, AppTextInput } from "../../components/Typography";
 import GoogleIcon from "../../../assets/icons/google.svg";
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
+import {
+  GoogleAuthProvider,
+  signInWithCredential,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth, db } from "../../../firebase";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { UserInitialData } from "../../types/user";
 
 export default function Login() {
   const router = useRouter();
@@ -22,6 +34,14 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        "467863551925-matcan7uqvgp4t370jus0e0u4tt39feu.apps.googleusercontent.com",
+    });
+  });
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -52,7 +72,7 @@ export default function Login() {
     }
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email.trim()) {
       setEmailError("Email tidak boleh kosong");
       setEmailTouched(true);
@@ -65,9 +85,81 @@ export default function Login() {
     }
 
     console.log("Login pressed", { email, password });
-    // TODO: Implement actual login API call
-    // Navigate to questionnaire after successful login
-    router.replace("/questionnaire");
+
+    setLoading(true);
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+
+      router.replace("/questionnaire");
+    } catch (err) {
+      console.error("error sign in " + err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+
+    try {
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
+      const signInResult = await GoogleSignin.signIn();
+      const idToken = signInResult.data?.idToken;
+
+      if (!idToken) {
+        throw new Error("Google ID token not found");
+      }
+
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+
+      const userCredential = await signInWithCredential(auth, googleCredential);
+      const user = userCredential.user;
+
+      // check if user document exists
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+
+        if (userData.isOnboardingCompleted) {
+          router.replace("/(app)");
+        } else {
+          router.replace("/questionnaire");
+        }
+      } else {
+        const initialData: UserInitialData = {
+          uid: user.uid,
+          fullName: user.displayName || "",
+          email: user.email,
+          joinedAt: serverTimestamp(),
+          isOnboardingCompleted: false,
+          stats: {
+            currentStreak: 0,
+            totalMoneySaved: 0,
+            healthProgress: 0,
+            lastRelapse: null,
+            totalCigarettesAvoided: 0,
+          },
+        };
+
+        await setDoc(userDocRef, initialData);
+
+        router.replace("/questionnaire");
+      }
+    } catch (err: any) {
+      if (err.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log("user cancelled login");
+      } else {
+        console.error("error sign up google " + err);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -174,6 +266,7 @@ export default function Login() {
 
           {/* Login Button */}
           <TouchableOpacity
+            disabled={loading}
             onPress={handleLogin}
             className="bg-[#FFFCF4] rounded-full py-3 mt-12"
           >
@@ -194,8 +287,12 @@ export default function Login() {
 
           {/* Google Login */}
           <View className="items-center">
-            <TouchableOpacity className="bg-[#FFFCF4] rounded-full px-10 py-3 items-center justify-center">
-              <GoogleIcon width={24} height={24}/>
+            <TouchableOpacity
+              disabled={loading}
+              onPress={handleGoogleSignIn}
+              className="bg-[#FFFCF4] rounded-full px-10 py-3 items-center justify-center"
+            >
+              <GoogleIcon width={24} height={24} />
             </TouchableOpacity>
           </View>
         </View>
