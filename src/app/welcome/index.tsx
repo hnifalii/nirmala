@@ -41,7 +41,7 @@ export default function WelcomeScreen() {
 
       <TouchableOpacity
         className="absolute top-10 right-6 z-20"
-        onPress={() => { router.replace("/questionnaire/after-questionnaire"); }}
+        onPress={() => { router.replace("/activities"); }}
       >
         <AppText className="text-white text-base">Lewati</AppText>
       </TouchableOpacity>

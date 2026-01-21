@@ -1,8 +1,9 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { Pressable, View, Text } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -50,6 +51,34 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" options={{ animation: "none" }} />
         <Stack.Screen name="(app)/index" />
       </Stack>
+      <SitemapButton />
     </>
+  );
+}
+
+function SitemapButton() {
+  const router = useRouter();
+
+  return (
+    <View style={{ position: "absolute", bottom: 40, right: 20, zIndex: 9999 }}>
+      <Pressable
+        onPress={() => router.push("/_sitemap")}
+        style={{
+          backgroundColor: "#FF6B6B",
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderRadius: 8,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+          elevation: 5,
+        }}
+      >
+        <Text style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>
+          📋
+        </Text>
+      </Pressable>
+    </View>
   );
 }
