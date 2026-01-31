@@ -27,6 +27,7 @@ import JedaDorongan from "../../../assets/icons/jeda-dorongan.svg";
 import EditIcon from "../../../assets/icons/tabler_edit.svg";
 import { DailyLogService } from "../../services/DailyLogService";
 import { Target } from "../../types/target";
+import { auth } from "../../../firebase";
 
 const { width } = Dimensions.get("window");
 const DAILY_LOG_SERVICE = new DailyLogService();
@@ -35,6 +36,8 @@ const HariIniScreen = () => {
     const [hasCheckedIn, setHasCheckedIn] = useState(false);
     const [streak, setStreak] = useState(1);
     const [target, setTarget] = useState<Target | null>(null);
+
+    const user = auth.currentUser;
 
     useFocusEffect(
         useCallback(() => {
@@ -126,7 +129,7 @@ const HariIniScreen = () => {
                 </View>
                 <View>
                   <AppText weight="bold" className="text-xl text-white">
-                    Alvin
+                    {user?.displayName}
                   </AppText>
                   <AppText weight="medium" className="text-sm text-[#E3EAD3]">
                     Profil saya
@@ -146,7 +149,7 @@ const HariIniScreen = () => {
                 weight="bold"
                 className="text-3xl text-white text-center"
               >
-                Hai Alvin, semoga harimu berjalan dengan lancar
+                Hai {user?.displayName}, semoga harimu berjalan dengan lancar
               </AppText>
             </View>
 
@@ -164,9 +167,9 @@ const HariIniScreen = () => {
                 
                 {/* Text and Icon Container */}
                 <View className="flex-row items-center space-x-2">
-                    <Text className="font-bold text-sm text-dark">
+                    <AppText weight="bold" className="text-sm text-dark">
                         Hari ke-{streak}
-                    </Text>
+                    </AppText>
                     {!hasCheckedIn && (
                         <EditIcon width={16} height={16} color="black" />
                     )}

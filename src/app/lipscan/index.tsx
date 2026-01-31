@@ -15,11 +15,12 @@ import SparkIcon from "../../../assets/icons/lip-spark.svg";
 import Step1 from "../../../assets/images/lipscan/step1.png";
 import Step2 from "../../../assets/images/lipscan/step2.png";
 import Step4 from "../../../assets/images/lipscan/step4.png";
-import MainIcon from "../../../assets/icons/bottom-main.svg";
+import AbstractIcon from "../../../assets/icons/abstract.svg";
 
 const { width, height } = Dimensions.get("window");
 
 import { analyzeLipCondition, LipAnalysisResult } from "../../services/LipscanService";
+import { ProcessingModal } from "../../components/ProcessingModal";
 
 export default function LipCheckScreen() {
   const router = useRouter();
@@ -313,18 +314,7 @@ export default function LipCheckScreen() {
              </CameraView>
              
              {/* Processing Overlay */}
-             {isProcessing && (
-                 <View className="absolute inset-0 top-0 bottom-0 left-0 right-0 bg-black/60 z-50 items-center justify-center backdrop-blur-sm">
-                      <View className="bg-[#FFFDF7] p-8 rounded-[32px] items-center w-[280px]">
-                           {/* Loading Spinner / Icon */}
-                          <MainIcon />
-                           
-                           <AppText weight="bold" className="text-gray-800 text-lg text-center">
-                               Memproses...
-                           </AppText>
-                      </View>
-                 </View>
-             )}
+             <ProcessingModal visible={isProcessing} />
         </View>
       </Modal>
     </View>
