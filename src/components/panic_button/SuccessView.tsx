@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
+import SuccessStars from "../../../assets/icons/success-stars.svg";
 
 interface SuccessViewProps {
   targetName: string;
@@ -14,9 +14,18 @@ export const SuccessView = ({
   photoUri,
   onProceed,
 }: SuccessViewProps) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onProceed();
+    }, 2000); // Auto-advance after 2 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <LinearGradient
-      colors={["#d4fc79", "#96e6a1"]}
+      colors={["#C9FFB7", "#FFFCF4"]}
+      locations={[0.12, 0.7]}
       style={{
         width: "80%",
         borderRadius: 20,
@@ -28,22 +37,16 @@ export const SuccessView = ({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
+        height: "60%",
       }}
     >
-      <Ionicons name="sparkles" size={48} color="white" />
+      <SuccessStars width={133} height={96} />
       <Text className="text-2xl font-bold text-[#333] mt-4 text-center">
         Yes, ketemu!
       </Text>
-      <Text className="text-sm text-[#555] mt-2 mb-6 text-center font-medium">
+      <Text className="text-sm text-[#A1A1A1] mt-2 mb-6 text-center font-medium">
         Ini {targetName} yang kamu cari
       </Text>
-
-      <TouchableOpacity
-        className="bg-white py-3 px-10 rounded-full shadow-sm"
-        onPress={onProceed}
-      >
-        <Text className="text-[#88d893] font-bold text-base">Lanjut</Text>
-      </TouchableOpacity>
     </LinearGradient>
   );
 };

@@ -1,6 +1,12 @@
 export const uploadImageToCloudinary = async (localUri: string) => {
-  const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET;
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  const cloudName = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+  console.log("Preparing Cloudinary Upload:", {
+    cloudName: cloudName ? "Present" : "Missing",
+    uploadPreset: uploadPreset ? "Present" : "Missing",
+    localUri,
+  });
 
   try {
     const formData = new FormData();
@@ -18,16 +24,19 @@ export const uploadImageToCloudinary = async (localUri: string) => {
       {
         method: "POST",
         body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
       },
     );
 
-    const data = await response.json();
+    const responseText = await response.text();
+    console.log("Cloudinary Response Status:", response.status);
+    console.log("Cloudinary Response Body:", responseText);
 
+    if (!response.ok) {
+        throw new Error(`Cloudinary Error: ${responseText}`);
+    }
+
+    const data = JSON.parse(responseText);
     return data.secure_url;
-
   } catch (err) {
     console.error("error upload to cloudinary " + err);
     throw new Error("error upload to cloudinary");

@@ -1,9 +1,14 @@
-import { db } from "../../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db, auth } from "../../firebase";
+import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy } from "firebase/firestore";
 import { uploadImageToCloudinary } from "../utils/uploadImage";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GEMINI_API_KEY = "AIzaSyCFfH54GfJu3BKN3sijVviY5WzryK79SbQ"
+const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY || "";
+
+if (!GEMINI_API_KEY) {
+  console.error("Error: EXPO_PUBLIC_GEMINI_API_KEY is not defined in environment variables.");
+}
+
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 interface ValidationResult {
@@ -71,8 +76,16 @@ export async function uploadPanicLog({
         throw new Error("Failed to get image URL from Cloudinary");
     }
 
-    // 2. Save to Firestore
+    // 2. Get User ID
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("Upload/Log failed: User not authenticated");
+      return null;
+    }
+
+    // 3. Save to Firestore
     await addDoc(collection(db, "panic_logs"), {
+      userId: user.uid,
       imageUrl: imageUrl,
       targetItem: targetName,
       timestamp: serverTimestamp(),
@@ -84,5 +97,27 @@ export async function uploadPanicLog({
   } catch (error) {
     console.error("Upload/Log failed:", error);
     return null;
+  }
+}
+
+export async function getUserPanicLogs() {
+  try {
+    const user = auth.currentUser;
+    if (!user) return [];
+
+    const q = query(
+      collection(db, "panic_logs"),
+      where("userId", "==", user.uid),
+      orderBy("timestamp", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Get panic logs failed:", error);
+    return [];
   }
 }

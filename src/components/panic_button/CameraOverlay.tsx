@@ -16,7 +16,7 @@ export const CameraOverlay = ({
     <>
       {/* Top Timer Overlay */}
       <View className="absolute top-24 self-center bg-white py-2 px-4 rounded-3xl z-10">
-        <Text className="text-[#ff4b4b] font-bold">
+        <Text className="text-[#ff4b4b] font-bold w-full text-center">
           Waktu tersisa: {timer} detik
         </Text>
       </View>
