@@ -6,6 +6,7 @@ export interface UserStats {
     healthProgress: number;
     lastRelapse: FieldValue | null;
     totalCigarettesAvoided: number;
+    totalActivitiesCompleted: number;
 }
 
 export interface UserInitialData {

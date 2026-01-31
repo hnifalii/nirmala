@@ -66,8 +66,7 @@ export default function QuestionnaireScreen() {
     setAnswers(updatedAnswers);
 
     if (isLastQuestion) {
-      // Questionnaire completed, navigate to home
-      // TODO: Save answers to backend/storage
+      // Questionnaire completed, navigate to next page
       console.log("Questionnaire completed:", updatedAnswers);
       
       setLoading(true);
@@ -208,10 +207,10 @@ export default function QuestionnaireScreen() {
                 selectedOption ? "bg-sage" : "bg-sage/50"
               }`}
               onPress={handleNext}
-              disabled={!selectedOption}
+              disabled={!selectedOption || loading}
             >
               <AppText
-                weight="semibold"
+                weight="medium"
                 className="text-white text-center text-base"
               >
                 {isLastQuestion ? "Selesai" : "Selanjutnya"}

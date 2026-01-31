@@ -19,10 +19,9 @@ export class ChatService {
     const user = auth.currentUser;
     if (!user) throw new Error("User belum terautentikasi");
 
-    const newSession: ChatSession = {
-      id: "session_0",
-      title: firstMessageText,
-      previewText: firstMessageText.substring(0, 30) + "...",
+    const newSession = {
+      title: firstMessageText || "Obrolan Baru",
+      previewText: (firstMessageText || "Mulai berbincang").substring(0, 30) + "...",
       isActive: true,
       createdAt: serverTimestamp(),
       lastUpdatedAt: serverTimestamp(),
@@ -30,7 +29,7 @@ export class ChatService {
 
     const sessionRef = await addDoc(
       collection(db, "users", user.uid, "chat_sessions"),
-      { newSession },
+      newSession,
     );
 
     return sessionRef.id;
@@ -74,7 +73,7 @@ export class ChatService {
       timestamp: serverTimestamp(),
     };
 
-    await addDoc(messageRef, { message });
+    await addDoc(messageRef, message);
 
     await updateDoc(
       doc(db, "users", user.uid, "chat_sessions", currentSessionId),
@@ -87,7 +86,9 @@ export class ChatService {
     const systemContext = await getUserContext(user.uid);
 
     try {
-      const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
+      const API_GEMINI = "AIzaSyCS0ADSsIbTJaHD2twLMc_lJxuPJjh3bxw";
+
+      const ai = new GoogleGenerativeAI(API_GEMINI);
 
       const prompt = `
         ${systemContext}
@@ -97,7 +98,7 @@ export class ChatService {
         { "message": "Jawaban dari pertanyaan yang diberikan" }
       `;
 
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const result = await model.generateContent(prompt);
       const response = result.response.text();
@@ -106,20 +107,34 @@ export class ChatService {
       const json = JSON.parse(jsonString);
       const message = json.message;
 
-      await addDoc(messageRef, {
+      const botMessage: Message = {
         text: message,
         sender: "bot",
         timestamp: serverTimestamp(),
-      });
+      };
+
+      await addDoc(messageRef, botMessage);
 
       return { sessionId: currentSessionId, message };
     } catch (err) {
       console.error("error send message " + err);
-      await addDoc(messageRef, {
-        text: "Maaf, Nala sedang pusing (Koneksi Error). Coba lagi ya.",
+      let errorText = "Maaf, Nala sedang pusing (Koneksi Error). Coba lagi ya.";
+      
+      // More specific error messages
+      if (err instanceof Error) {
+        if (err.message.includes("permission")) {
+          errorText = "Maaf, ada masalah dengan akses data. Hubungi admin.";
+        } else if (err.message.includes("API")) {
+          errorText = "Maaf, layanan AI sedang offline. Coba lagi nanti.";
+        }
+      }
+      
+      const errorMessage: Message = {
+        text: errorText,
         sender: "bot",
         timestamp: serverTimestamp(),
-      });
+      };
+      await addDoc(messageRef, errorMessage);
       throw err;
     }
   }
@@ -137,7 +152,7 @@ export class ChatService {
         sessionId,
         "messages",
       ),
-      orderBy("timestamp", "desc"),
+      orderBy("timestamp", "asc"),
     );
 
     const snapshot = await getDocs(q);
@@ -147,8 +162,8 @@ export class ChatService {
       return {
         _id: doc.id,
         text: data.text,
-        createdAt: data.timestamp?.toDate() || new Date(),
-        sender: data.sender == "user" ? "user" : "bot",
+        timestamp: data.timestamp?.toDate() || new Date(),
+        sender: data.sender === "user" ? "user" : "bot",
       };
     });
   }

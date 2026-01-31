@@ -85,7 +85,7 @@ const AnimatedButton = ({ goal, isSelected, onPress, colors }: any) => {
           </View>
         )}
         <AppText
-          weight="semibold"
+          weight="bold"
           className={`text-base ${
             isSelected ? "text-gray-800" : colors.textColor
           }`}
@@ -187,10 +187,11 @@ export default function AfterQuestionnaireScreen() {
 
   const handleSelectGoal = (goalId: string) => {
     setSelectedGoals((prev) => {
+      // Enforce single selection
       if (prev.includes(goalId)) {
-        return prev.filter((id) => id !== goalId);
+        return [];
       } else {
-        return [...prev, goalId];
+        return [goalId];
       }
     });
   };
@@ -198,15 +199,21 @@ export default function AfterQuestionnaireScreen() {
   const handleContinue = async () => {
     if (selectedGoals.length === 0) return;
     setIsLoading(true);
-    console.log("Selected goals:", selectedGoals);
 
     try {
       const user = auth.currentUser;
       if (!user) return;
 
+      // Find the text for the selected goal ID
+      const selectedGoalId = selectedGoals[0];
+      const selectedGoalOption = SAVING_GOALS.find(g => g.id === selectedGoalId);
+      const goalName = selectedGoalOption ? selectedGoalOption.text : selectedGoalId;
+
+      console.log("Saving goal:", goalName);
+
       await updateDoc(doc(db, "users", user.uid), {
         savingsGoal: {
-          name: selectedGoals.join(', '),
+          name: goalName,
           isDone: false,
           target: 0,
           current: 0,
@@ -274,9 +281,9 @@ export default function AfterQuestionnaireScreen() {
           {/* Info Banner */}
           <View className="flex-row items-center p-4 mb-6">
             <View className="mr-3 w-6 h-6 items-center justify-center rounded-full bg-blue-400 border border-white">
-              <AppText weight="semibold">!</AppText>
+              <AppText weight="medium">!</AppText>
             </View>
-            <AppText weight="semibold" className="text-white text-base flex-1">
+            <AppText weight="medium" className="text-white text-base flex-1">
               Kami mencatat uang dari rokok yang tidak kamu beli sebagai
               tabungan.
             </AppText>
@@ -331,7 +338,7 @@ export default function AfterQuestionnaireScreen() {
                   activeOpacity={0.7}
                 >
                   <AppText
-                    weight="semibold"
+                    weight="medium"
                     className="text-base text-white text-center"
                   >
                     Lainnya
@@ -345,7 +352,7 @@ export default function AfterQuestionnaireScreen() {
               pointerEvents={isCustomInputMode ? "auto" : "none"}
               className="items-center gap-4"
             >
-              <AppText weight="semibold" className="text-white text-lg mt-4">
+              <AppText weight="medium" className="text-white text-lg mt-4">
                 Masukkan tujuan kamu:
               </AppText>
               <AppTextInput
@@ -363,7 +370,7 @@ export default function AfterQuestionnaireScreen() {
                   activeOpacity={0.7}
                 >
                   <AppText
-                    weight="semibold"
+                    weight="medium"
                     className="text-base text-white text-center"
                   >
                     Kembali
@@ -398,6 +405,7 @@ export default function AfterQuestionnaireScreen() {
               className="py-3 px-8 rounded-full bg-sky items-center justify-center shadow-lg"
               onPress={handleContinue}
               activeOpacity={0.7}
+              disabled={isLoading}
             >
               <AppText
                 weight="bold"

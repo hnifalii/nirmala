@@ -15,13 +15,13 @@ import { AppText, AppTextInput } from "../../components/Typography";
 import GoogleIcon from "../../../assets/icons/google.svg";
 import {
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
+  // GoogleAuthProvider,
   signInWithCredential,
   updateProfile,
 } from "firebase/auth";
 import { auth, db } from "../../../firebase";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
-import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
+// import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import { UserInitialData } from "../../types/user";
 
 export default function SignUp() {
@@ -42,12 +42,12 @@ export default function SignUp() {
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    GoogleSignin.configure({
-      webClientId:
-        "467863551925-matcan7uqvgp4t370jus0e0u4tt39feu.apps.googleusercontent.com",
-    });
-  });
+  // useEffect(() => {
+  //   GoogleSignin.configure({
+  //     webClientId:
+  //       "467863551925-matcan7uqvgp4t370jus0e0u4tt39feu.apps.googleusercontent.com",
+  //   });
+  // }, []);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -222,81 +222,88 @@ export default function SignUp() {
           healthProgress: 0,
           lastRelapse: null,
           totalCigarettesAvoided: 0,
+          totalActivitiesCompleted: 0,
         },
       };
 
       await setDoc(doc(db, "users", user.uid), initialData);
 
       router.replace("/questionnaire");
-    } catch (err) {
-      console.error("error sign up " + err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGooGleSignUp = async () => {
-    setLoading(true);
-
-    try {
-      await GoogleSignin.hasPlayServices({
-        showPlayServicesUpdateDialog: true,
-      });
-
-      const signInResult = await GoogleSignin.signIn();
-      const idToken = signInResult.data?.idToken;
-
-      if (!idToken) {
-        throw new Error("Google ID token not found");
-      }
-
-      const googleCredential = GoogleAuthProvider.credential(idToken);
-
-      const userCredential = await signInWithCredential(auth, googleCredential);
-      const user = userCredential.user;
-
-      // check if user document exists
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-
-        if (userData.isOnboardingCompleted) {
-          router.replace("/(app)");
-        } else {
-          router.replace("/questionnaire");
-        }
-      } else {
-        const initialData: UserInitialData = {
-          uid: user.uid,
-          fullName: fullName,
-          email: user.email,
-          joinedAt: serverTimestamp(),
-          isOnboardingCompleted: false,
-          stats: {
-            currentStreak: 0,
-            totalMoneySaved: 0,
-            healthProgress: 0,
-            lastRelapse: null,
-            totalCigarettesAvoided: 0,
-          },
-        };
-
-        await setDoc(userDocRef, initialData);
-
-        router.replace("/questionnaire");
-      }
     } catch (err: any) {
-      if (err.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log('user cancelled login');
+      console.error("error sign up " + err);
+      if (err.code === "auth/email-already-in-use") {
+        setEmailError("Email sudah terdaftar");
       } else {
-        console.error("error sign up google " + err);
+        setEmailError("Gagal membuat akun, coba lagi");
       }
     } finally {
       setLoading(false);
     }
   };
+
+  // const handleGoogleSignUp = async () => {
+  //   setLoading(true);
+
+  //   try {
+  //     await GoogleSignin.hasPlayServices({
+  //       showPlayServicesUpdateDialog: true,
+  //     });
+
+  //     const signInResult = await GoogleSignin.signIn();
+  //     const idToken = signInResult.data?.idToken;
+
+  //     if (!idToken) {
+  //       throw new Error("Google ID token not found");
+  //     }
+
+  //     const googleCredential = GoogleAuthProvider.credential(idToken);
+
+  //     const userCredential = await signInWithCredential(auth, googleCredential);
+  //     const user = userCredential.user;
+
+  //     // check if user document exists
+  //     const userDocRef = doc(db, "users", user.uid);
+  //     const userDocSnap = await getDoc(userDocRef);
+
+  //     if (userDocSnap.exists()) {
+  //       const userData = userDocSnap.data();
+
+  //       if (userData.isOnboardingCompleted) {
+  //         router.replace("/(app)");
+  //       } else {
+  //         router.replace("/questionnaire");
+  //       }
+  //     } else {
+  //       const initialData: UserInitialData = {
+  //         uid: user.uid,
+  //         fullName: user.displayName || "",
+  //         email: user.email,
+  //         joinedAt: serverTimestamp(),
+  //         isOnboardingCompleted: false,
+  //         stats: {
+  //           currentStreak: 0,
+  //           totalMoneySaved: 0,
+  //           healthProgress: 0,
+  //           lastRelapse: null,
+  //           totalCigarettesAvoided: 0,
+  //           totalActivitiesCompleted: 0,
+  //         },
+  //       };
+
+  //       await setDoc(userDocRef, initialData);
+
+  //       router.replace("/questionnaire");
+  //     }
+  //   } catch (err: any) {
+  //     if (err.code === statusCodes.SIGN_IN_CANCELLED) {
+  //       console.log('user cancelled login');
+  //     } else {
+  //       console.error("error sign up google " + err);
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <KeyboardAvoidingView
@@ -307,7 +314,7 @@ export default function SignUp() {
         {/* Logo */}
         <View className="flex-row gap-2 items-center justify-center mb-8">
           <NirmalaIcon width={36} height={36} />
-          <AppText weight="semibold" className="text-white text-2xl">
+          <AppText weight="medium" className="text-white text-2xl">
             nirmala
           </AppText>
         </View>
@@ -315,7 +322,7 @@ export default function SignUp() {
         {/* Header */}
         <View className="mb-4">
           <AppText
-            weight="bold"
+            weight="medium"
             className="text-3xl mb-1 text-white text-center"
           >
             Buat akun
@@ -334,7 +341,7 @@ export default function SignUp() {
         >
           Sudah memiliki akun?{" "}
           <AppText
-            weight="semibold"
+            weight="medium"
             className="text-[#BCE4FE] underline"
             onPress={() => router.replace("/(auth)/login")}
           >
@@ -347,7 +354,7 @@ export default function SignUp() {
           {/* Full Name Input */}
           <View>
             <AppTextInput
-              weight="semibold"
+              weight="medium"
               className={`bg-[#97AE8F] text-white px-4 py-5 rounded-lg text-base ${
                 fullNameError && fullNameTouched
                   ? "border-2 border-red-500"
@@ -369,7 +376,7 @@ export default function SignUp() {
           {/* Email Input */}
           <View>
             <AppTextInput
-              weight="semibold"
+              weight="medium"
               className={`bg-[#97AE8F] text-white px-4 py-5 rounded-lg text-base ${
                 emailError && emailTouched ? "border-2 border-red-500" : ""
               }`}
@@ -392,7 +399,7 @@ export default function SignUp() {
           <View>
             <View className="flex-row items-center max-h-16">
               <AppTextInput
-                weight="semibold"
+                weight="medium"
                 className={`flex-1 bg-[#97AE8F] text-white rounded-r-none px-4 py-5 text-base ${
                   passwordError && passwordTouched
                     ? "border-2 border-red-500"
@@ -427,7 +434,7 @@ export default function SignUp() {
           <View>
             <View className="flex-row items-center max-h-16">
               <AppTextInput
-                weight="semibold"
+                weight="medium"
                 className={`flex-1 bg-[#97AE8F] text-white rounded-r-none px-4 py-5 text-base ${
                   confirmPasswordError && confirmPasswordTouched
                     ? "border-2 border-red-500"
@@ -466,7 +473,7 @@ export default function SignUp() {
               className="bg-[#FFFCF4] rounded-full py-3"
             >
               <AppText
-                weight="bold"
+                weight="medium"
                 className="text-center text-lg text-gray-700"
               >
                 Buat akun
@@ -475,22 +482,22 @@ export default function SignUp() {
           </View>
 
           {/* Divider */}
-          <View className="flex-row items-center gap-3 my-4">
+          {/* <View className="flex-row items-center gap-3 my-4">
             <View className="flex-1 h-px bg-white/30" />
             <AppText className="text-white/60 text-sm">Hubungkan akun</AppText>
             <View className="flex-1 h-px bg-white/30" />
-          </View>
+          </View> */}
 
           {/* Google SignUp */}
-          <View className="items-center">
+          {/* <View className="items-center">
             <TouchableOpacity
               disabled={loading}
-              onPress={handleGooGleSignUp}
+              onPress={handleGoogleSignUp}
               className="bg-[#FFFCF4] rounded-full px-10 py-3 items-center justify-center"
             >
               <GoogleIcon width={24} height={24} />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </View>
     </KeyboardAvoidingView>

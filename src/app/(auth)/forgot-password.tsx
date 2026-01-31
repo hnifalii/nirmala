@@ -95,7 +95,7 @@ export default function ForgotPassword() {
             {/* Logo */}
             <View className="flex-row gap-2 items-center justify-center mb-8">
               <NirmalaIcon width={36} height={36} />
-              <AppText weight="semibold" className="text-white text-2xl">
+              <AppText weight="medium" className="text-white text-2xl">
                 nirmala
               </AppText>
             </View>
@@ -119,7 +119,7 @@ export default function ForgotPassword() {
             {/* Email Input */}
             <View className="mb-2">
               <AppTextInput
-                weight="semibold"
+                weight="medium"
                 className={`bg-[#97AE8F] text-white px-4 py-5 rounded-lg text-base ${
                   emailError && emailTouched ? "border-2 border-red-500" : ""
                 }`}
@@ -134,7 +134,7 @@ export default function ForgotPassword() {
               />
               {emailError && emailTouched && (
                 <AppText
-                  weight="semibold"
+                  weight="medium"
                   className="text-red-200 text-xs mt-2"
                 >
                   {emailError}

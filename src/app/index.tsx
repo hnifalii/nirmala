@@ -30,43 +30,71 @@ export default function AnimatedSplashScreen() {
   const hasNavigated = useRef(false);
   const [showText, setShowText] = useState(false);
 
-  const goNext = () => {
-    if (!hasNavigated.current) {
-      hasNavigated.current = true;
+  // Check auth state immediately (don't wait for animation)
+  useEffect(() => {
+    const checkAuthAndNavigate = async () => {
+      try {
+        return new Promise<void>((resolve) => {
+          const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            try {
+              if (currentUser) {
+                console.log("User logged in:", currentUser.uid);
+                
+                try {
+                  const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
 
-      const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-        if (currentUser) {
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                  if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    console.log("User data exists, isOnboardingCompleted:", userData?.isOnboardingCompleted);
 
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-
-            if (userData.isOnboardingCompleted) {
-              router.replace("/(app)");
-            } else {
-              router.replace("/questionnaire");
+                    // Navigate based on onboarding status
+                    if (userData?.isOnboardingCompleted) {
+                      router.replace("/(app)");
+                    } else {
+                      router.replace("/questionnaire");
+                    }
+                  } else {
+                    console.log("User document doesn't exist, going to welcome");
+                    router.replace("/welcome");
+                  }
+                } catch (firestoreErr) {
+                  console.error('Firestore error:', firestoreErr);
+                  // If permission denied or other Firestore error, still navigate based on auth
+                  // Assume incomplete onboarding for safety
+                  router.replace("/questionnaire");
+                }
+              } else {
+                console.log("No user logged in, going to welcome");
+                router.replace("/welcome");
+              }
+            } catch (err) {
+              console.error('Auth state change error:', err);
+              router.replace('/welcome');
+            } finally {
+              unsubscribe();
+              resolve();
             }
-          } else {
-            router.replace("/welcome");
-          }
-        }
-      });
+          });
+        });
+      } catch (err) {
+        console.error('Auth check error:', err);
+        router.replace('/welcome');
+      }
+    };
 
-      return unsubscribe;
-    }
+    checkAuthAndNavigate();
+  }, [router]);
+
+  const goNext = () => {
+    // Animation callback - auth check already happened
+    // This is just for UX, navigation already triggered by useEffect
   };
 
   useEffect(() => {
-    // Reset for hot reload
-    hasNavigated.current = false;
-    animationProgress.value = 0;
-    setShowText(false);
-
     const startAnimation = async () => {
       await SplashScreen.hideAsync();
 
       // FASE 1: Logo diam 2 detik, text hidden
-      // Setelah 2 detik, show text dan mulai animasi
       setTimeout(() => {
         setShowText(true);
       }, 2000);
