@@ -23,7 +23,11 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.byantora.nirmala"
+      "package": "com.byantora.nirmala",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/icons/nirmala-icon.svg"
@@ -38,6 +42,12 @@
         }
       ],
       "expo-build-properties"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f2f7a89d-975c-4f3b-8c0d-7c26986585f1"
+      }
+    }
   }
 }
