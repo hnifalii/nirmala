@@ -134,14 +134,11 @@ export default function AppLayout() {
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
           tabBarLabel: () => null, // No label for middle button
+          // This makes the screen transparent over the previous one
+          presentation: "transparentModal",
+          animation: "fade",
         }}
-        listeners={() => ({
-          tabPress: (e) => {
-            e.preventDefault(); // Prevent navigation
-            // TODO: Open modal or action
-            console.log("Central button pressed");
-          },
-        })}
+        // Listener removed to allow default navigation
       />
       <Tabs.Screen
         name="pola"
