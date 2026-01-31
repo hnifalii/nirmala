@@ -56,9 +56,7 @@ export default function GoalAmountScreen() {
       if (!user) return;
 
       await updateDoc(doc(db, "users", user.uid), {
-        savingsGoal: {
-          target: parseInt(amount),
-        },
+        "savingsGoal.target": parseInt(amount),
         isOnboardingCompleted: true,
       });
 
@@ -97,11 +95,11 @@ export default function GoalAmountScreen() {
           {/* Info Banner */}
           <View className="flex-row items-center p-4 mb-6">
             <View className="mr-3 w-6 h-6 items-center justify-center rounded-full bg-blue-400 border border-white">
-              <AppText weight="semibold" className="text-white">
+              <AppText weight="medium" className="text-white">
                 !
               </AppText>
             </View>
-            <AppText weight="semibold" className="text-white text-sm flex-1">
+            <AppText weight="medium" className="text-white text-sm flex-1">
               Kami mencatat uang dari rokok yang tidak kamu beli sebagai
               tabungan.
             </AppText>

@@ -38,6 +38,7 @@ export default function RootLayout() {
         <Stack.Screen name="activities/index" />
         <Stack.Screen name="(auth)" options={{ animation: "none" }} />
         <Stack.Screen name="(app)/index" />
+        <Stack.Screen name="chatbot" />
       </Stack>
       <SitemapButton />
     </>

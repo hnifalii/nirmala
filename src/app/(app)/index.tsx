@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { Link, router, useFocusEffect } from "expo-router";
 import {
   Text,
   View,
@@ -6,7 +6,9 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from "react-native";
+import React, { useState, useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,10 +22,88 @@ import ScanIcon from "../../../assets/icons/tabler_line-scan.svg";
 import WaveIcon from "../../../assets/icons/mingcute_wave-fill.svg";
 import AsteriskIcon from "../../../assets/icons/lucide_asterisk.svg";
 import JedaDorongan from "../../../assets/icons/jeda-dorongan.svg";
+import EditIcon from "../../../assets/icons/tabler_edit.svg";
+import { DailyLogService } from "../../services/DailyLogService";
+import { Target } from "../../types/target";
 
 const { width } = Dimensions.get("window");
+const DAILY_LOG_SERVICE = new DailyLogService();
 
 const HariIniScreen = () => {
+    const [hasCheckedIn, setHasCheckedIn] = useState(false);
+    const [streak, setStreak] = useState(1);
+    const [target, setTarget] = useState<Target | null>(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            const checkStatus = async () => {
+                try {
+                    const status = await DAILY_LOG_SERVICE.hasLoggedToday();
+                    const currentStreak = await DAILY_LOG_SERVICE.getUserStreak();
+                    const target = await DAILY_LOG_SERVICE.getTargetData();
+                    
+                    setHasCheckedIn(status);
+                    
+                    // Logic:
+                    // If not checked in: Display current streak (which is completed streak).
+                    // Example: DB has 5. Button says "Hari ke-5". (Or maybe +1?)
+                    // User said: "diambil dari collection users.stats.currentStreak"
+                    // And "ketika check in current streak tersebut ditambah satu".
+                    // This implies the standard display IS the current streak.
+                    // If I have 5, and I check in, it becomes 6.
+                    // However, for a "Daily Check-in" button, usually it says "Day 6" if you have done 5.
+                    // But I will stick to what the user said: "Hari ke-{streak}".
+                    // If streak is 0, display 1?
+                    // Let's assume minimum 1 for display "Hari ke-1".
+                    
+                    // Wait, if I have done 5 days.
+                    // If I display "Hari ke-5", user thinks "I am doing day 5 again".
+                    // But if I display "Hari ke-6", it matches "Progress".
+                    // If user request "diambil dari ... currentStreak", maybe currentStreak INCLUDES today if checked in?
+                    // No, increments on success.
+                    
+                    // Let's optimize for UX + compliance:
+                    // If hasCheckedIn: Display currentStreak (e.g. 6).
+                    // If !hasCheckedIn: Display currentStreak + 1 (e.g. 6).
+                    // Because "Hari ke-6" is what I am doing today.
+                    // This satisfies "ketika check in... ditambah satu". 
+                    // (Old value + 1 = New value).
+                    // But user said "diambil dari ... currentStreak". 
+                    // I will display logic: currentStreak + (hasCheckedIn ? 0 : 1).
+                    // wait, if I haven't checked int, streak is 5.
+                    // I show "Hari ke-6".
+                    // User clicks. Success. Streak becomes 6.
+                    // I show "Hari ke-6".
+                    // The number doesn't change? That contradicts "ditambah satu".
+                    
+                    // Alternative:
+                    // DB Streak = 5.
+                    // !CheckIn: Show 5. ("Hari ke-5"). 
+                    // CheckIn: Streak Becomes 6. Show 6 ("Hari ke-6").
+                    // This satisfies "ditambah satu".
+                    // So I will just use the value from DB directly.
+                    // If DB is 0, show 1? "Hari ke-1".
+                    // If DB is 5, show 5.
+                    
+                    setStreak(currentStreak === 0 ? 1 : currentStreak);
+                    setTarget(target);
+
+                } catch (error) {
+                    console.error("Failed to check daily log status", error);
+                }
+            };
+            checkStatus();
+        }, [])
+    );
+
+    const handleCheckInPress = () => {
+        if (hasCheckedIn) {
+            Alert.alert("Sudah Check-in", "Kamu sudah melakukan check-in hari ini. Kembali lagi besok ya!");
+            return;
+        }
+        router.push("/check-in");
+    };
+
   return (
     <LinearGradient
       colors={["#728C69", "#FFE05B", "#728C69"]}
@@ -66,18 +146,33 @@ const HariIniScreen = () => {
               </Text>
             </View>
 
+            {/* Tombol Check-in Harian */}
             <View className="mt-5 items-center">
-              <View className="flex-row items-center bg-white py-2 px-5 rounded-full space-x-2">
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleCheckInPress} 
+                className={`flex-row items-center py-2 px-5 rounded-full space-x-2 ${hasCheckedIn ? 'bg-white/80' : 'bg-white'}`}
+              >
                 <View className="flex-row space-x-2">
                   <View className="w-2 h-2 bg-[#FDE047] rotate-45" />
                   <View className="w-2 h-2 bg-[#FBA359] rotate-45" />
                 </View>
-                <Text className="font-bold text-sm text-dark">Hari ke-1</Text>
+                
+                {/* Text and Icon Container */}
+                <View className="flex-row items-center space-x-2">
+                    <Text className="font-bold text-sm text-dark">
+                        Hari ke-{streak}
+                    </Text>
+                    {!hasCheckedIn && (
+                        <EditIcon width={16} height={16} color="black" />
+                    )}
+                </View>
+
                 <View className="flex-row space-x-2">
                   <View className="w-2 h-2 bg-[#FBA359] rotate-45" />
                   <View className="w-2 h-2 bg-[#FDE047] rotate-45" />
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -110,11 +205,11 @@ const HariIniScreen = () => {
 
               <Text className="font-regular text-[#004CC7] text-lg mb-4">
                 <Text className="font-extrabold text-lg text-[#004CC7] tracking-tighter">
-                  Rp 120.000
+                  Rp {target?.current.toLocaleString('id-ID')}
                 </Text>{" "}
                 dari{" "}
                 <Text className="font-extrabold text-lg text-[#FFE05B] tracking-tighter">
-                  Rp 750.000
+                  Rp {target?.target.toLocaleString('id-ID')}
                 </Text>
               </Text>
 

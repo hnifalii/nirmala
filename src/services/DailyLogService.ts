@@ -12,22 +12,48 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { DailyLog, DailyLogInput, LogData } from "../types/dailyLog";
+import { Target } from "../types/target";
 
 export class DailyLogService {
   async getTargetData() {
     const user = auth.currentUser;
     if (!user) throw new Error("User tidak terautentikasi");
 
-    const res = await getDoc(doc(db, "users", user.uid, "savingsGoal"));
-    if (!res.exists()) throw new Error("Target data tidak ditemukan");
+    // Fix: savingsGoal is a field in the user document, not a separate document
+    const res = await getDoc(doc(db, "users", user.uid));
+    if (!res.exists()) throw new Error("User data tidak ditemukan");
 
     const data = res.data();
+    const savingsGoal = data.savingsGoal;
+
+    if (!savingsGoal) throw new Error("Target data tidak ditemukan");
 
     return {
-      item: data.name,
-      current: data.current,
-      target: data.target,
-    };
+      name: savingsGoal.name,
+      current: savingsGoal.current || 0, // Handle missing current
+      target: savingsGoal.target,
+    } as Target;
+  }
+
+  async getUserStreak() {
+    const user = auth.currentUser;
+    if (!user) return 0;
+
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        // Default to 1 if 0 or undefined, to show "Hari ke-1" for new users?
+        // User request: "diambil dari collection users.stats.currentStreak"
+        // If it is 0, returning 0 might result in "Hari ke-0".
+        // I'll return the raw value and handle display logic in UI.
+        return data.stats?.currentStreak || 0;
+      }
+      return 0;
+    } catch (err) {
+      console.error("Error fetching streak", err);
+      return 0;
+    }
   }
 
   async getUserDailyLogs() {
@@ -49,7 +75,7 @@ export class DailyLogService {
     if (!user) throw new Error("User tidak terautentikasi");
 
     const todayDate = new Date().toISOString().split("T")[0];
-    
+
     const userRef = doc(db, "users", user.uid);
     const logRef = doc(db, "users", user.uid, "daily_logs", todayDate);
 
