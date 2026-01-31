@@ -47,7 +47,9 @@ const HariIniScreen = () => {
                   <Feather name="user" size={28} color="#587B56" />
                 </View>
                 <View>
-                  <AppText weight="bold" className="text-xl text-white">Alvin</AppText>
+                  <AppText weight="bold" className="text-xl text-white">
+                    Alvin
+                  </AppText>
                   <AppText weight="medium" className="text-sm text-[#E3EAD3]">
                     Profil saya
                   </AppText>
@@ -65,7 +67,10 @@ const HariIniScreen = () => {
                 color="#FDB813"
                 style={{ marginBottom: 10, alignSelf: "center" }}
               />
-              <AppText weight="bold" className="text-3xl text-white text-center">
+              <AppText
+                weight="bold"
+                className="text-3xl text-white text-center"
+              >
                 Hai Alvin, semoga harimu berjalan dengan lancar
               </AppText>
             </View>
@@ -92,10 +97,14 @@ const HariIniScreen = () => {
                 >
                   <View className="w-3.5 h-3.5 rounded-full bg-[#FF9A6C] absolute z-10 top-0 left-0"></View>
                   <View className="bg-[#fde26e] py-2.5 px-6 rounded-full space-x-1 flex flex-row items-center">
-                    <MaterialCommunityIcons name="pencil" size={15} color="#363B43" />
-                  <AppText weight="bold" className="text-base text-dark">
-                    Isi Catatan
-                  </AppText>
+                    <MaterialCommunityIcons
+                      name="pencil"
+                      size={15}
+                      color="#363B43"
+                    />
+                    <AppText weight="bold" className="text-base text-dark">
+                      Isi Catatan
+                    </AppText>
                   </View>
                 </TouchableOpacity>
               )}
@@ -104,9 +113,15 @@ const HariIniScreen = () => {
 
           {/* Main Content Container */}
           <View className="relative flex-1 bg-[#FCFCFC] rounded-t-[30px] mt-5 px-5 pt-7 pb-40 min-h-[600px]">
-            <BlurredCircle className="absolute bottom-10 -left-20 w-60 h-60" color="#728C69" />
-            <BlurredCircle className="absolute bottom-10 -right-20 w-60 h-60" color="#728C69" />
-            
+            <BlurredCircle
+              className="absolute bottom-10 -left-20 w-60 h-60"
+              color="#728C69"
+            />
+            <BlurredCircle
+              className="absolute bottom-10 -right-20 w-60 h-60"
+              color="#728C69"
+            />
+
             {/* Main Card (Celengan Target) */}
             <LinearGradient
               colors={["#2576FF", "#70ADFF", "#BCE4FE"]}
@@ -127,17 +142,27 @@ const HariIniScreen = () => {
                 <View className="items-center justify-center relative">
                   <EmptyJar width={110} height={130} />
                   <View className="absolute">
-                    <MaterialCommunityIcons name="gift" size={32} color="#ACACAC" />
+                    <MaterialCommunityIcons
+                      name="gift"
+                      size={32}
+                      color="#ACACAC"
+                    />
                   </View>
                 </View>
               </View>
 
               <AppText className="text-[#004CC7] text-xl mb-4">
-                <AppText weight="bold" className="text-xl text-[#004CC7] tracking-tighter">
+                <AppText
+                  weight="bold"
+                  className="text-xl text-[#004CC7] tracking-tighter"
+                >
                   Rp0
                 </AppText>{" "}
                 dari{" "}
-                <AppText weight="bold" className="text-xl text-[#FFE05B] tracking-tighter">
+                <AppText
+                  weight="bold"
+                  className="text-xl text-[#FFE05B] tracking-tighter"
+                >
                   Rp750.000
                 </AppText>
               </AppText>
@@ -160,7 +185,11 @@ const HariIniScreen = () => {
                   <AppText weight="bold" className="text-white text-lg">
                     Cek Kondisi Bibir
                   </AppText>
-                  <CekBibir width={60} height={60} color="rgba(255,255,255,0.4)" />
+                  <CekBibir
+                    width={60}
+                    height={60}
+                    color="rgba(255,255,255,0.4)"
+                  />
                 </View>
               </TouchableOpacity>
 
@@ -173,7 +202,11 @@ const HariIniScreen = () => {
                   <AppText weight="bold" className="text-white text-lg">
                     Lihat Pola
                   </AppText>
-                  <LihatPola width={60} height={60} color="rgba(255,255,255,0.4)" />
+                  <LihatPola
+                    width={60}
+                    height={60}
+                    color="rgba(255,255,255,0.4)"
+                  />
                 </View>
               </TouchableOpacity>
             </View>
@@ -186,10 +219,7 @@ const HariIniScreen = () => {
                 </AppText>
               </View>
 
-              <AppText
-                weight="medium"
-                className="text-base text-gray-400 mb-6"
-              >
+              <AppText weight="medium" className="text-base text-gray-400 mb-6">
                 Latihan singkat untuk membantu mengelola dorongan hari ini
               </AppText>
 
@@ -219,21 +249,28 @@ const HariIniScreen = () => {
                 </TouchableOpacity>
 
                 {/* Node 2: Locked */}
-                <View className="absolute top-[235px] left-[60px] w-24 h-24 rounded-full bg-[#E2E8F0] justify-center items-center border-[3px] border-white z-10">
-                  <MaterialCommunityIcons name="lock" size={24} color="#94A3B8" />
-                  <View className="absolute -bottom-6">
-                    <AppText
-                      weight="medium"
-                      className="text-[10px] text-gray-400 text-center"
-                    >
-                      Terkunci
-                    </AppText>
-                  </View>
-                </View>
+                {/* Node 2: Active (Pasang Gambar) */}
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  className="absolute top-[235px] left-[60px] w-24 h-24 rounded-full overflow-hidden justify-center items-center border-[3px] border-white z-10 bg-[#FFDDC1] shadow-lg"
+                  onPress={() =>
+                    router.push("/activities/detail-pasang-gambar")
+                  }
+                >
+                  <MaterialCommunityIcons
+                    name="image-filter-frames"
+                    size={40}
+                    color="#B46C00"
+                  />
+                </TouchableOpacity>
 
                 {/* Node 3: Locked */}
                 <View className="absolute top-[370px] right-[60px] w-24 h-24 rounded-full bg-[#E2E8F0] justify-center items-center border-[3px] border-white z-10">
-                  <MaterialCommunityIcons name="lock" size={24} color="#94A3B8" />
+                  <MaterialCommunityIcons
+                    name="lock"
+                    size={24}
+                    color="#94A3B8"
+                  />
                   <View className="absolute -bottom-6">
                     <AppText
                       weight="medium"
