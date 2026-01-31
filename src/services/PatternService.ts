@@ -19,7 +19,7 @@ export interface PatternData {
 export class PatternService {
   private dailyLogService = new DailyLogService();
 
-  async getPatternData(): Promise<PatternData> {
+  async getPatternData(period: "week" | "month" = "week"): Promise<PatternData> {
     if (!auth.currentUser) {
       return this.getDefaultData();
     }
@@ -35,7 +35,7 @@ export class PatternService {
 
       return {
         heatmap: this.processHeatmap(dailyLogs),
-        chart: this.processChart(dailyLogs),
+        chart: this.processChart(dailyLogs, period),
         insights: this.processInsights(panicLogs),
         stats: await this.processStats(dailyLogs),
       };
@@ -46,64 +46,69 @@ export class PatternService {
   }
 
   private processHeatmap(logs: any[]): number[] {
-    // Map last 30 days. 
-    // Log structure: { date: "YYYY-MM-DD", status: "success" | "relapse" | "partial_success", ... }
-    // Output: Array of 30 integers (0, 1, 2)
-    
+    // 30-day grid representing the current month or last 30 days.
+    // For specific requirement "Bulan Ini" (Current Month).
     const days = Array(30).fill(0);
     const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
     
+    // Filter logs for current month
     logs.forEach(log => {
-      const logDate = new Date(log.date);
-      const diffTime = Math.abs(today.getTime() - logDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-      
-      if (diffDays <= 30 && diffDays > 0) {
-        // Index 29 is yesterday, Index 0 is 30 days ago? 
-        // Or matching the calendar grid logic. 
-        // Let's assume the array maps to the days in the month view.
-        // For simplicity, let's map simply based on date matching if possible, 
-        // but given the UI is just a grid, let's fill it based on recent activity.
-        
-        // Actually the UI renders current month. Let's filter for current month.
-        if (logDate.getMonth() === today.getMonth() && logDate.getFullYear() === today.getFullYear()) {
-          const dayIndex = logDate.getDate() - 1; // 1-indexed date to 0-indexed array
-          if (dayIndex >= 0 && dayIndex < 30) {
-             days[dayIndex] = log.status === "success" ? 2 : 1;
-          }
-        }
+      const logDate = new Date(log.date); // Assumed YYYY-MM-DD or ISO
+      if (logDate.getMonth() === currentMonth && logDate.getFullYear() === currentYear) {
+         const dayIndex = logDate.getDate() - 1; // 0-indexed
+         if (dayIndex >= 0 && dayIndex < 30) {
+             // 2 = Success (Hijau Tua), 1 = Relapse/Partial (Hijau Muda)
+             // Default to success if not specified, verify logic
+             days[dayIndex] = (log.status === "success") ? 2 : 1;
+         }
       }
     });
 
     return days;
   }
 
-  private processChart(logs: any[]): { day: string; value: number }[] {
-    // Last 7 days chart
+  private processChart(logs: any[], period: "week" | "month"): { day: string; value: number }[] {
     const chartData = [];
-    const daysOfWeek = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
     
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        const dayLabel = daysOfWeek[d.getDay()];
+    if (period === "week") {
+         // Last 7 days
+        const daysOfWeek = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const dayLabel = daysOfWeek[d.getDay()];
 
-        const log = logs.find(l => l.date === dateStr);
-        const value = log ? (log.cigarettesAvoided || 0) : 0; // Or money saved? UI says "Rokok Dihindari" or maybe generic value.
-        // Looking at mock data, value is ~4000-9000. Could be money? 
-        // The mock chart label says "10rb". Likely Money Saved.
-        // Checking UI code: renderBarChart -> Subtitle "Rokok Dihindari" but values are thousands?
-        // Wait, "Rokok Dihindari" usually counts 1, 2, 10. 
-        // Maybe the UI meant Money Saved? "Hemat Rp 420rb".
-        // Let's use Money Saved as it fits the scale better, or scale cigarettes.
-        // If the label is "Rokok Dihindari", values should be small (0-20).
-        // If values are 5000, it's money.
-        // Let's use Money Saved for now as it makes more impressive charts.
-        
-        const moneyValue = log ? (log.moneySaved || 0) : 0;
-        chartData.push({ day: dayLabel, value: moneyValue });
+            const log = logs.find(l => l.date === dateStr);
+            const value = log ? (log.moneySaved || 0) : 0; 
+            chartData.push({ day: dayLabel, value: value });
+        }
+    } else {
+        // "Bulan": Show last 4 weeks summary
+        // Group by week (approx) or show last 30 days?
+        // Limited space in chart (7 bars). Let's show last 4 weeks.
+        for (let i = 3; i >= 0; i--) {
+            const start = new Date();
+            start.setDate(start.getDate() - (i * 7 + 6));
+            const end = new Date();
+            end.setDate(end.getDate() - (i * 7));
+            
+            const label = `Mg ${4-i}`; // Mg 1, Mg 2, etc.
+            
+            let weeklyTotal = 0;
+            logs.forEach(l => {
+                const lDate = new Date(l.date);
+                if (lDate >= start && lDate <= end) {
+                    weeklyTotal += (l.moneySaved || 0);
+                }
+            });
+             chartData.push({ day: label, value: weeklyTotal });
+        }
+        // Fill remaining slots to maintain layout if needed, or just return 4 bars works too
     }
+
     return chartData;
   }
 
@@ -112,56 +117,85 @@ export class PatternService {
       return { peakHour: "--:--", mainTrigger: "Belum ada data" };
     }
 
-    // Peak Hour
-    const hours = panicLogs.map(l => {
-        // Timestamp is Firestore Timestamp
-        const date = l.timestamp?.toDate ? l.timestamp.toDate() : new Date();
-        return date.getHours();
-    });
+    // REQUIREMENT: "Waktu Rawan" shows the LAST time panic button was used.
+    // panicLogs are ordered by timestamp desc in panicService.ts getUserPanicLogs().
+    // So panicLogs[0] is the latest.
+    const lastLog = panicLogs[0];
+    let lastTimeStr = "--:--";
     
-    const mode = (arr: any[]) =>
-        arr.sort((a,b) =>
-            arr.filter(v => v===a).length - arr.filter(v => v===b).length
-        ).pop();
-        
-    const peakH = mode(hours);
-    const peakHourStr = `${peakH?.toString().padStart(2, '0')}:00`;
+    if (lastLog && lastLog.timestamp) {
+        // Handle Firestore Timestamp or Date
+        const date = lastLog.timestamp.toDate ? lastLog.timestamp.toDate() : new Date(lastLog.timestamp);
+        lastTimeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    }
 
-    // Main Trigger
-    const triggers = panicLogs.map(l => l.targetItem);
-    const mainTrigger = mode(triggers) || "Tidak ada";
+    // Main Trigger - Dummy Data as requested (since we don't collect actual triggers yet, only scavenger items)
+    // "jika menggunakan panic button misal karena terindikasi keinginan untuk merokok"
+    const DUMMY_TRIGGERS = [
+        "Stres Pekerjaan", 
+        "Waktu Senggang", 
+        "Setelah Makan", 
+        "Bangun Tidur", 
+        "Melihat Orang Merokok", 
+        "Karena keinginan untuk merokok",
+        "Karena stres",
+        "Bosan"
+    ];
+    // Return a random trigger
+    const mainTrigger = DUMMY_TRIGGERS[Math.floor(Math.random() * DUMMY_TRIGGERS.length)];
 
-    return { peakHour: peakHourStr, mainTrigger };
+    return { peakHour: lastTimeStr, mainTrigger };
   }
 
   private async processStats(logs: any[]): Promise<any> {
-     // This usually comes from User document (savingsGoal, stats).
-     // We can fetch it via DailyLogService.getTargetData().
-     
-     // Quick fetch for now
-     try {
-         const targetData = await this.dailyLogService.getTargetData();
-         // We might need strict stats from 'users/{uid}' doc which has 'stats' field based on DailyLogService updateDoc.
-         // But DailyLogService doesn't expose a 'getStats' method yet, only 'getTargetData'.
-         // Let's rely on aggregating logs or fetching the user doc directly if needed.
-         // For now, let's aggregate logs manually for consistency.
-         
-         const totalMoney = logs.reduce((acc, curr) => acc + (curr.moneySaved || 0), 0);
-         const totalCigarettes = logs.reduce((acc, curr) => acc + (curr.cigarettesAvoided || 0), 0);
-         
-         // Streak calculation is complex, let's just count recent consecutive successes?
-         // Actually, let's use a placeholder or read from user doc if possible. 
-         // Since we don't have easy access to user doc stats without adding a method, 
-         // let's return totals.
-         
-         return {
-             currentStreak: 0, // Placeholder, tough to calc correctly without stored value
-             moneySaved: totalMoney,
-             cigarettesAvoided: totalCigarettes
-         };
-     } catch (e) {
-         return { currentStreak: 0, moneySaved: 0, cigarettesAvoided: 0 };
-     }
+      // Calculate totals
+      const totalMoney = logs.reduce((acc, curr) => acc + (curr.moneySaved || 0), 0);
+      const totalCigarettes = logs.reduce((acc, curr) => acc + (curr.cigarettesAvoided || 0), 0);
+      
+      // Calculate Streak
+      // Sort desc
+      const sortedLogs = logs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      let currentStreak = 0;
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      const todayStr = today.toISOString().split('T')[0];
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      // Check if streak is active (logged today or yesterday)
+      const hasLogToday = sortedLogs.some(l => l.date === todayStr && l.status === 'success');
+      const hasLogYesterday = sortedLogs.some(l => l.date === yesterdayStr && l.status === 'success');
+      
+      if (!hasLogToday && !hasLogYesterday) {
+          currentStreak = 0;
+      } else {
+          // Count backwards
+          // Find start date (today or yesterday)
+          let checkDate = new Date();
+          if (!hasLogToday) {
+               checkDate.setDate(checkDate.getDate() - 1); 
+          }
+          
+          while (true) {
+              const checkStr = checkDate.toISOString().split('T')[0];
+              const log = sortedLogs.find(l => l.date === checkStr);
+              
+              if (log && log.status === 'success') {
+                  currentStreak++;
+                  checkDate.setDate(checkDate.getDate() - 1);
+              } else {
+                  break;
+              }
+          }
+      }
+
+      return {
+          currentStreak,
+          moneySaved: totalMoney,
+          cigarettesAvoided: totalCigarettes
+      };
   }
 
   private getDefaultData(): PatternData {

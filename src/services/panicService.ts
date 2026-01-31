@@ -83,9 +83,9 @@ export async function uploadPanicLog({
       return null;
     }
 
-    // 3. Save to Firestore
-    await addDoc(collection(db, "panic_logs"), {
-      userId: user.uid,
+    // 3. Save to Firestore - Use subcollection for better permissions
+    await addDoc(collection(db, "users", user.uid, "panic_logs"), {
+      userId: user.uid, // Keep for redundancy/migration if needed
       imageUrl: imageUrl,
       targetItem: targetName,
       timestamp: serverTimestamp(),
@@ -106,8 +106,7 @@ export async function getUserPanicLogs() {
     if (!user) return [];
 
     const q = query(
-      collection(db, "panic_logs"),
-      where("userId", "==", user.uid),
+      collection(db, "users", user.uid, "panic_logs"),
       orderBy("timestamp", "desc")
     );
 
