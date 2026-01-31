@@ -21,6 +21,8 @@ import ChatIcon from "../../../assets/icons/chatbot-icon.svg";
 import Murung from "../../../assets/icons/murung.svg";
 import Cerita from "../../../assets/icons/cerita.svg";
 import Edit from "../../../assets/icons/tabler_edit.svg";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurredCircle } from "../../components/BlurredCircle";
 
 interface DisplayMessage {
   id: string;
@@ -294,7 +296,12 @@ const ChatbotScreen = () => {
 
           {/* User Profile Section */}
           <View className="absolute bottom-0 left-0 right-0 p-4 border-t border-t-[#E0E0E0] bg-white">
-            <View className="bg-[#728C69] rounded-3xl p-4 mb-3 overflow-hidden shadow-sm">
+            <LinearGradient
+              colors={["#728C69", "#FFE05B"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className="rounded-3xl p-4 mb-3 overflow-hidden shadow-sm"
+            >
               <View className="flex-row items-center">
                 {/* Avatar */}
                 <View
@@ -318,7 +325,7 @@ const ChatbotScreen = () => {
 
                 {/* Bintang sudah dihapus di sini */}
               </View>
-            </View>
+            </LinearGradient>
           </View>
         </Animated.View>
 
@@ -369,25 +376,33 @@ const ChatbotScreen = () => {
                 </AppText>
 
                 {/* Input Field */}
-                <View className="w-full bg-white rounded-full border border-[#E0E0E0] mb-4 flex-row items-center">
-                  <TextInput
-                    placeholder="Nala siap mendengar"
-                    value={inputText}
-                    onChangeText={setInputText}
-                    className="flex-1 text-sm text-[#333] font-semibold m-2 opacity-60"
-                    placeholderTextColor="#999"
-                  />
-                  <TouchableOpacity
-                    className="bg-[#728C69] p-3 m-2 rounded-full"
-                    onPress={handleSendMessage}
-                  >
-                    <Ionicons
-                      name="send"
-                      size={20}
-                      color={`#fff`}
-                      className="ml-2"
+                <View className="w-full mb-4 relative">
+                   <BlurredCircle
+                      color="#CDFFBC"
+                      className="absolute -top-10 -left-10 w-[120%] h-[200px] opacity-70"
+                      style={{ transform: [{ scale: 1.2 }] }}
+                   />
+                  <View className="w-full bg-white rounded-full border border-[#E0E0E0] flex-row items-center shadow-sm">
+                    <TextInput
+                      placeholder="Nala siap mendengar"
+                      value={inputText}
+                      onChangeText={setInputText}
+                      className="flex-1 text-sm text-[#333] font-semibold ml-4"
+                      placeholderTextColor="#999"
+                      maxLength={500}
                     />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#728C69] p-3 m-2 rounded-full"
+                      onPress={handleSendMessage}
+                    >
+                      <Ionicons
+                        name="send"
+                        size={20}
+                        color={`#fff`}
+                        className="ml-2"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
                 {/* Quick Actions */}
