@@ -86,7 +86,7 @@ export class ChatService {
     const systemContext = await getUserContext(user.uid);
 
     try {
-      const API_GEMINI = "AIzaSyCS0ADSsIbTJaHD2twLMc_lJxuPJjh3bxw";
+      const API_GEMINI = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
       const ai = new GoogleGenerativeAI(API_GEMINI);
 
