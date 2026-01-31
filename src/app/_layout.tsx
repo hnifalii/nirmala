@@ -40,7 +40,7 @@ export default function RootLayout() {
         <Stack.Screen name="(app)/index" />
         <Stack.Screen name="chatbot" />
       </Stack>
-      <SitemapButton />
+      {/* <SitemapButton /> */}
     </>
   );
 }
