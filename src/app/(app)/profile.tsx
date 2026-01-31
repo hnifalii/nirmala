@@ -4,20 +4,36 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Image,
   Dimensions,
+  Alert,
 } from "react-native";
-import { Title, Body, Label } from "../../components/Typography";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Title, Body, Label, AppText } from "../../components/Typography";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import Svg, { Path, Defs, LinearGradient, Stop } from "react-native-svg";
 import BottomMascot from "../../../assets/icons/bottom-mascot.svg";
+import { auth } from "../../../firebase";
+import { signOut } from "firebase/auth";
 
 const { width } = Dimensions.get("window");
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("Stres");
+  const user = auth.currentUser;
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.replace("/(auth)/login");
+    } catch (error) {
+      Alert.alert("Error", "Gagal keluar dari aplikasi");
+    }
+  };
+
+  const getAvatarColor = (name: string) => {
+    const colors = ["#728C69", "#9DB4B4", "#FFE05B", "#CDFFBC"];
+    return colors[(name?.charCodeAt(0) || 0) % colors.length];
+  };
 
   return (
     <View style={styles.container}>
@@ -62,33 +78,42 @@ export default function ProfileScreen() {
           </Svg>
 
           <View style={styles.topBar}>
+            {/* Empty view to balance layout if needed or just remove settings button */}
             <View style={{ width: 40 }} />
-            <TouchableOpacity
-              style={styles.settingsButton}
-              onPress={() => router.push("/settings")}
-            >
-              <Ionicons name="settings-outline" size={24} color="#fff" />
-            </TouchableOpacity>
           </View>
 
           <View style={styles.profileAbsoluteContainer}>
             <View style={styles.avatarWrapper}>
-              <Image
-                source={{ uri: "https://i.pravatar.cc/300?img=12" }}
-                style={styles.avatar}
-              />
-              <TouchableOpacity
-                style={styles.editIconContainer}
-                onPress={() => router.push("/edit-profile")}
+              <View
+                style={[
+                  styles.avatar,
+                  {
+                    backgroundColor: getAvatarColor(user?.displayName || "?"),
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                ]}
               >
-                <Feather name="edit-2" size={14} color="#FFF" />
-              </TouchableOpacity>
+                <AppText
+                  weight="bold"
+                  style={{ 
+                    fontSize: 48, 
+                    color: "#FFF",
+                    lineHeight: 60,
+                    includeFontPadding: false,
+                    textAlign: 'center',
+                    textAlignVertical: 'center'
+                  }}
+                >
+                  {user?.displayName?.charAt(0).toUpperCase() || "?"}
+                </AppText>
+              </View>
             </View>
             <Title style={styles.name} color="#000000">
-              Ahmad Raihan Khomeini{"\n"}Saputra
+              {user?.displayName || "Pengguna"}
             </Title>
             <Body style={styles.joinedText} color="#4B5563">
-              Bergabung sejak 2026
+              {user?.email}
             </Body>
           </View>
         </View>
@@ -113,7 +138,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* My Progress Section */}
+        {/* My Progress Section - Simplified */}
         <View style={styles.section}>
           <View style={styles.rowBetween}>
             <Title style={styles.sectionTitle} color="#111827">
@@ -124,37 +149,6 @@ export default function ProfileScreen() {
                 BARU
               </Label>
             </View>
-          </View>
-
-          <View style={styles.tabsRow}>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === "Stress" && styles.activeTab]}
-              onPress={() => setActiveTab("Stress")}
-            >
-              <View style={styles.dotYellow} />
-              <Label
-                color={activeTab === "Stress" ? "#1F2937" : "#4B5563"}
-                weight="bold"
-              >
-                Stres
-              </Label>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.tab,
-                activeTab === "Anxiety" && styles.activeTab,
-                activeTab !== "Anxiety" && styles.inactiveTab,
-              ]}
-              onPress={() => setActiveTab("Anxiety")}
-            >
-              <View style={styles.dotOrange} />
-              <Label
-                color={activeTab === "Anxiety" ? "#1F2937" : "#4B5563"}
-                weight="bold"
-              >
-                Cemas
-              </Label>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.trackingCard}>
@@ -175,9 +169,12 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Check In Button */}
-        <TouchableOpacity style={styles.checkInButton}>
-          <Title className="text-lg" color="#fff">Mulai Konsultasi</Title>
+        {/* Logout Button */}
+        <TouchableOpacity 
+          style={[styles.checkInButton, { backgroundColor: "#EF4444" }]} 
+          onPress={handleLogout}
+        >
+          <Title className="text-lg" color="#fff">Keluar</Title>
         </TouchableOpacity>
 
         {/* Bottom Mascot */}
@@ -196,7 +193,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     width: width,
-    height: 300,
+    height: 250,
     alignItems: "center",
     marginBottom: 20,
   },
@@ -208,7 +205,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingTop: 60,
+    paddingTop: 80,
     paddingHorizontal: 20,
   },
   settingsButton: {
@@ -219,7 +216,7 @@ const styles = StyleSheet.create({
   },
   profileAbsoluteContainer: {
     alignItems: "center",
-    marginTop: 0,
+    marginTop: 10,
   },
   avatarWrapper: {
     position: "relative",
@@ -305,39 +302,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
-  },
-  tabsRow: {
-    flexDirection: "row",
-    gap: 16,
-    marginBottom: 20,
-  },
-  tab: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 24,
-    gap: 8,
-  },
-  activeTab: {
-    backgroundColor: "#E5E7EB",
-  },
-  inactiveTab: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#FFF",
-  },
-  dotYellow: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#F59E0B",
-  },
-  dotOrange: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#EA580C",
   },
   trackingCard: {
     backgroundColor: "#FFF",
