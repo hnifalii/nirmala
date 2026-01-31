@@ -153,7 +153,7 @@ const HariIniScreen = () => {
             <View className="flex-col space-y-2 mb-7">
               {/* Cek Bibir Card */}
               <TouchableOpacity
-                onPress={() => router.push("/(app)/index")} // Placeholder to stay on page or add param
+                onPress={() => router.push("/lipscan")}
                 className="flex-1 h-[80px] rounded-[20px] relative overflow-hidden bg-[#FF9A6C] justify-center"
               >
                 <View className="flex-1 flex-row items-center justify-between px-5">
