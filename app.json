@@ -41,18 +41,6 @@
           "cameraPermission": "Allow Nirmala to access your camera to scan items during panic interventions."
         }
       ],
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#728c69",
-          "image": "./assets/images/splash-icon.png",
-          "dark": {
-            "image": "./assets/images/splash-icon.png",
-            "backgroundColor": "#728c69"
-          },
-          "imageWidth": 200
-        }
-      ],
       "expo-build-properties"
     ],
     "extra": {

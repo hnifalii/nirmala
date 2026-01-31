@@ -236,7 +236,7 @@ const HariIniScreen = () => {
                 </Text>
               </Text>
 
-              <TouchableOpacity className="bg-white py-2.5 px-6 rounded-[20px]">
+              <TouchableOpacity onPress={() => router.push("/celengan")} className="bg-white py-2.5 px-6 rounded-[20px]">
                 <AppText weight="bold" className="text-sm text-dark">
                   Lihat Detail
                 </AppText>
