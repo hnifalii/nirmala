@@ -81,6 +81,7 @@ export default function PanicButtonScreen() {
               {/* Camera Box */}
               <View className="flex-1 w-full my-6 rounded-[30px] overflow-hidden relative bg-black shadow-lg border-4 border-white">
                 <CameraView
+                
                   style={StyleSheet.absoluteFill}
                   ref={cameraRef}
                   facing="back"
