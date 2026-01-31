@@ -1,4 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { auth, db } from "../../firebase";
+import { Timestamp, collection, addDoc, serverTimestamp, doc, updateDoc, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 // Use environment variable for API key
 const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
@@ -24,6 +26,12 @@ export interface LipAnalysisResult {
     suggestions: string[];
   }[];
   analysisConfidence: number;
+}
+
+export interface SavedLipScan extends LipAnalysisResult {
+  id: string;
+  createdAt: Date | Timestamp;
+  imageUrl?: string; // Opsional: jika kamu upload fotonya ke Cloudinary
 }
 
 export const analyzeLipCondition = async (
@@ -94,6 +102,8 @@ export const analyzeLipCondition = async (
     // Clean potential markdown blocks
     const jsonString = text.replace(/```json|```/g, "").trim();
     
+    
+
     return JSON.parse(jsonString);
 
   } catch (error) {
@@ -124,3 +134,74 @@ export const analyzeLipCondition = async (
     };
   }
 };
+
+import { uploadImageToCloudinary } from "../utils/uploadImage";
+
+export const saveScanResult = async (analysisData: LipAnalysisResult, imageUri: string | null = null) => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("User tidak terautentikasi");
+
+    try {
+      let finalImageUrl = imageUri;
+
+      // 1. Upload ke Cloudinary jika imageUri adalah local path
+      if (imageUri && (imageUri.startsWith('file://') || imageUri.startsWith('content://') || !imageUri.startsWith('http'))) {
+          try {
+              console.log("Uploading lip scan image...");
+              finalImageUrl = await uploadImageToCloudinary(imageUri);
+              console.log("Upload success:", finalImageUrl);
+          } catch (uploadError) {
+              console.error("Failed to upload image, saving without image URL:", uploadError);
+              finalImageUrl = null; // Fallback: simpan tanpa gambar jika upload gagal
+          }
+      }
+
+      // 2. Simpan ke Sub-collection
+      const scanRef = collection(db, 'users', user.uid, 'lip_scans');
+      
+      const docRef = await addDoc(scanRef, {
+        ...analysisData,
+        imageUrl: finalImageUrl, 
+        createdAt: serverTimestamp(),
+      });
+
+      // 3. Update Profil User (Optional tapi Recommended)
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        'healthStats.lastLipScanDate': serverTimestamp(),
+        'healthStats.lastLipCondition': analysisData.status.level 
+      });
+
+      return docRef.id;
+
+    } catch (error) {
+      console.error("Error saving lip scan:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * 2. AMBIL HISTORY SCAN
+   * Mengambil daftar riwayat scan user (misal untuk halaman 'Progress')
+   */
+  export const getScanHistory = async ()  : Promise<SavedLipScan[]> => {
+    const user = auth.currentUser;
+    if (!user) return [];
+
+    try {
+      const scanRef = collection(db, 'users', user.uid, 'lip_scans');
+      // Urutkan dari yang terbaru
+      const q = query(scanRef, orderBy('createdAt', 'desc'), limit(20));
+      
+      const snapshot = await getDocs(q);
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as SavedLipScan));
+
+    } catch (error) {
+      console.error("Error fetching history:", error);
+      return [];
+    }
+  }
