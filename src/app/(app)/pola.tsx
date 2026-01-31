@@ -24,18 +24,22 @@ const DAYS_OF_WEEK = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 const Y_LABELS = ["50rb", "40rb", "30rb", "20rb", "10rb"]; // Updated scale for money
 
 export default function PolaScreen() {
+  // State for chart period
+  const [period, setPeriod] = useState<"week" | "month">("week");
   const [data, setData] = useState<PatternData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showPeriodDropdown, setShowPeriodDropdown] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const service = new PatternService();
-      const result = await service.getPatternData();
+      const result = await service.getPatternData(period);
       setData(result);
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [period]); // Refetch when period changes
 
   const renderHeatmap = () => {
     if (!data) return null;
@@ -118,10 +122,55 @@ export default function PolaScreen() {
     return (
       <View style={styles.chartContainer}>
         <View style={styles.chartHeader}>
-          <Subtitle weight="bold">Uang Hemat (7 Hari)</Subtitle>
-          <View style={styles.periodSelector}>
-            <Label style={{ fontSize: 12, marginRight: 4 }}>Minggu</Label>
-            <Ionicons name="chevron-down" size={12} color="#333" />
+          <Subtitle weight="bold">Uang Hemat</Subtitle>
+          <View style={{ position: "relative", zIndex: 10 }}>
+            <TouchableOpacity
+              style={styles.periodSelector}
+              onPress={() => setShowPeriodDropdown(!showPeriodDropdown)}
+            >
+              <Label style={{ fontSize: 12, marginRight: 4 }}>
+                {period === "week" ? "Minggu Ini" : "Bulan Ini"}
+              </Label>
+              <Ionicons name="chevron-down" size={12} color="#333" />
+            </TouchableOpacity>
+
+            {showPeriodDropdown && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 30,
+                  right: 0,
+                  backgroundColor: "white",
+                  borderRadius: 8,
+                  padding: 4,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 5,
+                  width: 100,
+                }}
+              >
+                <TouchableOpacity
+                  style={{ padding: 8 }}
+                  onPress={() => {
+                    setPeriod("week");
+                    setShowPeriodDropdown(false);
+                  }}
+                >
+                  <Label style={{ fontSize: 12 }}>Minggu Ini</Label>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ padding: 8 }}
+                  onPress={() => {
+                    setPeriod("month");
+                    setShowPeriodDropdown(false);
+                  }}
+                >
+                  <Label style={{ fontSize: 12 }}>Bulan Ini</Label>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
         <View style={styles.chartBody}>
@@ -187,14 +236,6 @@ export default function PolaScreen() {
           <Title color="#fff" style={{ fontSize: 24 }}>
             Wawasan & Pola
           </Title>
-          <View style={styles.headerIcons}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="search" size={20} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="receipt-outline" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
         </View>
 
         <View style={styles.mainStat}>
@@ -257,7 +298,7 @@ export default function PolaScreen() {
               <View style={{ flex: 1 }}>
                 <Body weight="bold">Waktu Rawan</Body>
                 <Label color="#6B7280">
-                  Keinginan merokok sering muncul sekitar{" "}
+                  Terakhir kali menggunakan panic button pada{" "}
                   <Body weight="bold">
                     {data?.insights.peakHour || "--:--"}
                   </Body>
