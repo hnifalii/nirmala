@@ -133,9 +133,6 @@ const HariIniScreen = () => {
                   </AppText>
                 </View>
               </View>
-              <TouchableOpacity className="w-10 h-10 rounded-full bg-white justify-center items-center">
-                <Notif width={20} height={20} />
-              </TouchableOpacity>
             </View>
 
             <View className="mt-7 items-center">
