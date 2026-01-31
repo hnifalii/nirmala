@@ -93,13 +93,14 @@ export default function PanicButtonScreen() {
                   <Text className="text-[#728C69]">{challengeTimer} detik</Text>
                 </Text>
 
-                {/* Camera Box */}
-                <View className="flex-1 w-full my-6 rounded-[30px] overflow-hidden relative bg-black shadow-lg border-4 border-white">
-                  <CameraView
-                    style={StyleSheet.absoluteFill}
-                    ref={cameraRef}
-                    facing="back"
-                  />
+              {/* Camera Box */}
+              <View className="flex-1 w-full my-6 rounded-[30px] overflow-hidden relative bg-black shadow-lg border-4 border-white">
+                <CameraView
+                
+                  style={StyleSheet.absoluteFill}
+                  ref={cameraRef}
+                  facing="back"
+                />
 
                   {/* Shutter Button */}
                   {phase === "camera" && (

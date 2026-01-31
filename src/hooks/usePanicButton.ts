@@ -73,6 +73,7 @@ export const usePanicButton = () => {
     if (cameraRef.current) {
       try {
         const photo = await cameraRef.current.takePictureAsync({
+          shutterSound: false,
           base64: true,
           quality: 0.5,
         });
