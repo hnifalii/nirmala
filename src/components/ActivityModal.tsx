@@ -298,7 +298,7 @@ export const ActivityModal = ({
                         onPress={() => handleButtonClick(button.action)}
                       >
                         <AppText
-                          weight="semibold"
+                          weight="medium"
                           className={`${index < 1 ? "text-gray-700" : "text-cream"} text-center`}
                         >
                           {button.label}
@@ -327,7 +327,7 @@ export const ActivityModal = ({
                         onPress={() => handleButtonClick(button.action)}
                       >
                         <AppText
-                          weight="semibold"
+                          weight="medium"
                           className={`${index < 1 ? "text-gray-700" : "text-cream"} text-center`}
                         >
                           {button.label}
@@ -356,7 +356,7 @@ export const ActivityModal = ({
                         onPress={() => handleButtonClick(button.action)}
                       >
                         <AppText
-                          weight="semibold"
+                          weight="medium"
                           className={`${index < 1 ? "text-gray-700" : "text-cream"} text-center`}
                         >
                           {button.label}

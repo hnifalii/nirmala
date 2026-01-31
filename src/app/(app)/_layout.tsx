@@ -75,14 +75,13 @@ export default function AppLayout() {
           left: 20,
           right: 20,
           backgroundColor: "#ffffff",
-          borderRadius: 15,
           height: 100,
           paddingTop: 25,
           paddingBottom: 40, // push labels up slightly
           ...styles.shadow,
         },
         tabBarLabelStyle: {
-          fontFamily: "Gilroy-Bold",
+          fontFamily: "Apercu-Medium",
           fontSize: 12,
         },
       }}
@@ -156,7 +155,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="kamu"
+        name="profile"
         options={{
           tabBarLabel: "Kamu",
           tabBarIcon: ({ size, focused }) =>
