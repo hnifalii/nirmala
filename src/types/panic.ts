@@ -11,6 +11,7 @@ export type PanicPhase =
   | "post_intervention_1"
   | "post_intervention_2"
   | "post_intervention_3"
+  | "post_intervention_4"
   | "done";
 
 export type ChallengeItem = {
