@@ -1,5 +1,5 @@
-import { Tabs } from "expo-router";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Tabs, useRouter } from "expo-router";
+import { View, StyleSheet, Text, TouchableOpacity, Pressable } from "react-native";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import NirmalaIcon from "../../../assets/icons/nirmala-icon.svg";
 import HomeIcon from "../../../assets/icons/streamline-plump_home-1-solid.svg";
@@ -10,6 +10,7 @@ import PolaIcon from "../../../assets/icons/bottom-pola.svg";
 import ProfilIcon from "../../../assets/icons/bottom-profile.svg";
 import ProfilOutlineIcon from "../../../assets/icons/bottom-profile-outline.svg";
 import MainIcon from "../../../assets/icons/bottom-main.svg";
+import ChatbotIcon from "../../../assets/icons/chatbot-icon.svg";
 
 const CustomTabBarButton = ({ children, onPress }: any) => (
   <TouchableOpacity
@@ -63,111 +64,139 @@ const TabIconContainer = ({
 
 export default function AppLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: true,
-        tabBarActiveTintColor: "#363B43", // dark (text color)
-        tabBarInactiveTintColor: "#363B43", // dark (text color)
-        tabBarStyle: {
-          position: "absolute",
-          bottom: 0,
-          left: 20,
-          right: 20,
-          backgroundColor: "#ffffff",
-          height: 100,
-          paddingTop: 25,
-          paddingBottom: 40, // push labels up slightly
-          ...styles.shadow,
-        },
-        tabBarLabelStyle: {
-          fontFamily: "Apercu-Medium",
-          fontSize: 12,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          tabBarLabel: "Hari Ini",
-          tabBarIcon: ({ size, focused }) =>
-            focused ? (
-              <TabIconContainer focused={true}>
-                <HomeIcon width={size} height={size} color="#587B56" />
-              </TabIconContainer>
-            ) : (
-              <TabIconContainer focused={false}>
-                <HomeOutlineIcon
-                  width={size}
-                  height={size}
-                  color="#587B56" // Green outline
-                />
-              </TabIconContainer>
+    <>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarShowLabel: true,
+          tabBarActiveTintColor: "#363B43", // dark (text color)
+          tabBarInactiveTintColor: "#363B43", // dark (text color)
+          tabBarStyle: {
+            position: "absolute",
+            bottom: 0,
+            left: 20,
+            right: 20,
+            backgroundColor: "#ffffff",
+            height: 100,
+            paddingTop: 25,
+            paddingBottom: 40, // push labels up slightly
+            ...styles.shadow,
+          },
+          tabBarLabelStyle: {
+            fontFamily: "Apercu-Medium",
+            fontSize: 12,
+          },
+        }}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            tabBarLabel: "Hari Ini",
+            tabBarIcon: ({ size, focused }) =>
+              focused ? (
+                <TabIconContainer focused={true}>
+                  <HomeIcon width={size} height={size} color="#587B56" />
+                </TabIconContainer>
+              ) : (
+                <TabIconContainer focused={false}>
+                  <HomeOutlineIcon
+                    width={size}
+                    height={size}
+                    color="#587B56" // Green outline
+                  />
+                </TabIconContainer>
+              ),
+          }}
+        />
+        <Tabs.Screen
+          name="celengan"
+          options={{
+            tabBarLabel: "Celengan",
+            tabBarIcon: ({ size, focused }) =>
+              focused ? (
+                <TabIconContainer focused={focused}>
+                  <CelenganIcon width={size} height={size} color="#587B56" />
+                </TabIconContainer>
+              ) : (
+                <TabIconContainer focused={focused}>
+                  <CelenganOutlineIcon
+                    width={size}
+                    height={size}
+                    color="#587B56"
+                  />
+                </TabIconContainer>
+              ),
+          }}
+        />
+        <Tabs.Screen
+          name="panic_button"
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons name="plus" size={30} color="#FFF" />
             ),
-        }}
-      />
-      <Tabs.Screen
-        name="celengan"
-        options={{
-          tabBarLabel: "Celengan",
-          tabBarIcon: ({ size, focused }) =>
-            focused ? (
-              <TabIconContainer focused={focused}>
-                <CelenganIcon width={size} height={size} color="#587B56" />
-              </TabIconContainer>
-            ) : (
-              <TabIconContainer focused={focused}>
-                <CelenganOutlineIcon
-                  width={size}
-                  height={size}
-                  color="#587B56"
-                />
-              </TabIconContainer>
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="panic_button"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <MaterialCommunityIcons name="plus" size={30} color="#FFF" />
-          ),
-          tabBarButton: (props) => <CustomTabBarButton {...props} />,
-          tabBarLabel: () => null, // No label for middle button
-          // This makes the screen transparent over the previous one
-          presentation: "transparentModal",
-          animation: "fade",
-        }}
+            tabBarButton: (props) => <CustomTabBarButton {...props} />,
+            tabBarLabel: () => null, // No label for middle button
+            // This makes the screen transparent over the previous one
+            presentation: "transparentModal",
+            animation: "fade",
+          }}
         // Listener removed to allow default navigation
-      />
-      <Tabs.Screen
-        name="pola"
-        options={{
-          tabBarLabel: "Pola",
-          tabBarIcon: ({ size, focused }) => (
-            <TabIconContainer focused={focused}>
-              <PolaIcon width={size} height={size} color="#587B56" />
-            </TabIconContainer>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarLabel: "Kamu",
-          tabBarIcon: ({ size, focused }) =>
-            focused ? (
-              <TabIconContainer focused={true}>
-                <ProfilOutlineIcon width={size} height={size} color="#587B56" />
-              </TabIconContainer>
-            ) : (
-              <TabIconContainer focused={false}>
-                <ProfilIcon width={size} height={size} color="#587B56" />
+        />
+        <Tabs.Screen
+          name="pola"
+          options={{
+            tabBarLabel: "Pola",
+            tabBarIcon: ({ size, focused }) => (
+              <TabIconContainer focused={focused}>
+                <PolaIcon width={size} height={size} color="#587B56" />
               </TabIconContainer>
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            tabBarLabel: "Kamu",
+            tabBarIcon: ({ size, focused }) =>
+              focused ? (
+                <TabIconContainer focused={true}>
+                  <ProfilOutlineIcon width={size} height={size} color="#587B56" />
+                </TabIconContainer>
+              ) : (
+                <TabIconContainer focused={false}>
+                  <ProfilIcon width={size} height={size} color="#587B56" />
+                </TabIconContainer>
+              ),
+          }}
+        />
+      </Tabs>
+      <ChatbotButton />
+    </>
+  );
+}
+
+function ChatbotButton() {
+  const router = useRouter();
+
+  return (
+    <View style={{ position: "absolute", bottom: 110, right: 20, zIndex: 9999 }}>
+      <Pressable
+        onPress={() => router.push("/chatbot")}
+        style={{
+          backgroundColor: "#ffffff",
+          paddingHorizontal: 16,
+          paddingVertical: 16,
+          borderRadius: 1000,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+          elevation: 5,
         }}
-      />
-    </Tabs>
+      >
+        <ChatbotIcon width={48} height={48} />
+      </Pressable>
+    </View>
   );
 }
 
