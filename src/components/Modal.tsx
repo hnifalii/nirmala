@@ -109,7 +109,7 @@ export function LoadingModal({
             <ActivityIndicator size="large" color="#93C5FD" />
           </View>
           <AppText
-            weight="semibold"
+            weight="medium"
             className="text-lg text-gray-800 text-center"
           >
             {message}

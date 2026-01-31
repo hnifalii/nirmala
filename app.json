@@ -5,11 +5,11 @@
     "slug": "nirmala",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icons/nirmala-icon.svg",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/icons/nirmala-icon.svg",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#749174"
     },
@@ -18,19 +18,26 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/nirmala-icon.svg",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#749174"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.mdetryalviano.nirmala"
+      "package": "com.byantora.nirmala"
     },
     "web": {
       "favicon": "./assets/icons/nirmala-icon.svg"
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Nirmala to access your camera to scan items during panic interventions."
+        }
+      ],
+      "expo-build-properties"
     ]
   }
 }
