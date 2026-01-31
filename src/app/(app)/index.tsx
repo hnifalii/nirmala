@@ -23,7 +23,6 @@ import LihatPola from "../../../assets/icons/lihat-pola-illustration.svg";
 import RuangKendali from "../../../assets/icons/ruang-kendali.svg";
 import { BlurredCircle } from "../../components/BlurredCircle";
 import { AppText } from "../../components/Typography";
-import { useState } from "react";
 import JedaDorongan from "../../../assets/icons/jeda-dorongan.svg";
 import EditIcon from "../../../assets/icons/tabler_edit.svg";
 import { DailyLogService } from "../../services/DailyLogService";

@@ -119,7 +119,7 @@ export class DailyLogService {
       const streakUpdate = status === "success" ? increment(1) : 0;
 
       await updateDoc(userRef, {
-        "savingsGoal.currentAmount": increment(moneySavedToday),
+        "savingsGoal.current": increment(moneySavedToday),
         "stats.totalCigarettesAvoided": increment(cigarettesAvoided),
         "stats.totalMoneySaved": increment(moneySavedToday),
         "stats.currentStreak": streakUpdate,
