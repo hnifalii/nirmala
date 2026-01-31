@@ -10,20 +10,24 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AktivitasPath from "../../../assets/aktivitas-path.png";
 import CloudIcon2 from "../../../assets/icons/material-symbols-light_cloud.svg";
-import CelenganIcon from "../../../assets/icons/bottom-celengan.svg";
 import Notif from "../../../assets/icons/notif.svg";
 import Sun from "../../../assets/icons/mage_sun-fill.svg";
 import EmptyJar from "../../../assets/icons/Empty jar.svg";
 import CekBibir from "../../../assets/icons/Cek-bibir-Illustration.svg";
-import ScanIcon from "../../../assets/icons/tabler_line-scan.svg";
-import WaveIcon from "../../../assets/icons/mingcute_wave-fill.svg";
 import AsteriskIcon from "../../../assets/icons/lucide_asterisk.svg";
-import JedaDorongan from "../../../assets/icons/jeda-dorongan.svg";
+import LihatPola from "../../../assets/icons/lihat-pola-illustration.svg";
+import RuangKendali from "../../../assets/icons/ruang-kendali.svg";
+import { BlurredCircle } from "../../components/BlurredCircle";
+import { AppText } from "../../components/Typography";
+import { useState } from "react";
 
 const { width } = Dimensions.get("window");
 
 const HariIniScreen = () => {
+  const [hasCheckedIn, setHasCheckedIn] = useState(false);
+
   return (
     <LinearGradient
       colors={["#728C69", "#FFE05B", "#728C69"]}
@@ -32,21 +36,21 @@ const HariIniScreen = () => {
     >
       <SafeAreaView className="flex-1">
         <ScrollView
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 0 }}
           showsVerticalScrollIndicator={false}
         >
           {/* Header Section */}
           <View className="px-5 pt-2.5 pb-5">
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center">
-                <View className="w-10 h-10 rounded-full bg-[#E3EAD3] justify-center items-center mr-2.5">
-                  <Feather name="user" size={24} color="#587B56" />
+                <View className="w-14 h-14 rounded-full bg-[#E3EAD3] justify-center items-center mr-2.5">
+                  <Feather name="user" size={28} color="#587B56" />
                 </View>
                 <View>
-                  <Text className="font-bold text-base text-white">Alvin</Text>
-                  <Text className="font-regular text-xs text-[#E3EAD3]">
+                  <AppText weight="bold" className="text-xl text-white">Alvin</AppText>
+                  <AppText weight="medium" className="text-sm text-[#E3EAD3]">
                     Profil saya
-                  </Text>
+                  </AppText>
                 </View>
               </View>
               <TouchableOpacity className="w-10 h-10 rounded-full bg-white justify-center items-center">
@@ -61,28 +65,48 @@ const HariIniScreen = () => {
                 color="#FDB813"
                 style={{ marginBottom: 10, alignSelf: "center" }}
               />
-              <Text className="font-bold text-xl text-white text-center leading-7">
+              <AppText weight="bold" className="text-3xl text-white text-center">
                 Hai Alvin, semoga harimu berjalan dengan lancar
-              </Text>
+              </AppText>
             </View>
 
             <View className="mt-5 items-center">
-              <View className="flex-row items-center bg-white py-2 px-5 rounded-full space-x-2">
-                <View className="flex-row space-x-2">
-                  <View className="w-2 h-2 bg-[#FDE047] rotate-45" />
-                  <View className="w-2 h-2 bg-[#FBA359] rotate-45" />
+              {hasCheckedIn ? (
+                <View className="flex-row items-center bg-white py-2 px-5 rounded-full space-x-2">
+                  <View className="flex-row space-x-2">
+                    <View className="w-2 h-2 bg-[#FDE047] rotate-45" />
+                    <View className="w-2 h-2 bg-[#FBA359] rotate-45" />
+                  </View>
+                  <AppText weight="bold" className="text-sm text-dark">
+                    Hari ke-1
+                  </AppText>
+                  <View className="flex-row space-x-2">
+                    <View className="w-2 h-2 bg-[#FBA359] rotate-45" />
+                    <View className="w-2 h-2 bg-[#FDE047] rotate-45" />
+                  </View>
                 </View>
-                <Text className="font-bold text-sm text-dark">Hari ke-1</Text>
-                <View className="flex-row space-x-2">
-                  <View className="w-2 h-2 bg-[#FBA359] rotate-45" />
-                  <View className="w-2 h-2 bg-[#FDE047] rotate-45" />
-                </View>
-              </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => setHasCheckedIn(true)}
+                  className="relative p-1 rounded-full border border-[#fde26e]"
+                >
+                  <View className="w-3.5 h-3.5 rounded-full bg-[#FF9A6C] absolute z-10 top-0 left-0"></View>
+                  <View className="bg-[#fde26e] py-2.5 px-6 rounded-full space-x-1 flex flex-row items-center">
+                    <MaterialCommunityIcons name="pencil" size={15} color="#363B43" />
+                  <AppText weight="bold" className="text-base text-dark">
+                    Isi Catatan
+                  </AppText>
+                  </View>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
           {/* Main Content Container */}
-          <View className="flex-1 bg-[#FCFCFC] rounded-t-[30px] mt-5 px-5 pt-7 min-h-[600px]">
+          <View className="relative flex-1 bg-[#FCFCFC] rounded-t-[30px] mt-5 px-5 pt-7 pb-40 min-h-[600px]">
+            <BlurredCircle className="absolute bottom-10 -left-20 w-60 h-60" color="#728C69" />
+            <BlurredCircle className="absolute bottom-10 -right-20 w-60 h-60" color="#728C69" />
+            
             {/* Main Card (Celengan Target) */}
             <LinearGradient
               colors={["#2576FF", "#70ADFF", "#BCE4FE"]}
@@ -102,144 +126,121 @@ const HariIniScreen = () => {
                 {/* Illustration Placeholder */}
                 <View className="items-center justify-center relative">
                   <EmptyJar width={110} height={130} />
-                  <View className="absolute top-1/3">
-                    <CelenganIcon width={40} height={40} color="#B5B5B5" />
+                  <View className="absolute">
+                    <MaterialCommunityIcons name="gift" size={32} color="#ACACAC" />
                   </View>
                 </View>
               </View>
 
-              <Text className="font-regular text-[#004CC7] text-lg mb-4">
-                <Text className="font-extrabold text-lg text-[#004CC7] tracking-tighter">
-                  Rp 120.000
-                </Text>{" "}
+              <AppText className="text-[#004CC7] text-xl mb-4">
+                <AppText weight="bold" className="text-xl text-[#004CC7] tracking-tighter">
+                  Rp0
+                </AppText>{" "}
                 dari{" "}
-                <Text className="font-extrabold text-lg text-[#FFE05B] tracking-tighter">
-                  Rp 750.000
-                </Text>
-              </Text>
+                <AppText weight="bold" className="text-xl text-[#FFE05B] tracking-tighter">
+                  Rp750.000
+                </AppText>
+              </AppText>
 
               <TouchableOpacity className="bg-white py-2.5 px-6 rounded-[20px]">
-                <Text className="font-bold text-sm text-dark">
+                <AppText weight="bold" className="text-sm text-dark">
                   Lihat Detail
-                </Text>
+                </AppText>
               </TouchableOpacity>
             </LinearGradient>
 
             {/* Quick Access Grid */}
-            <View className="flex-row gap-2 mb-7">
+            <View className="flex-col space-y-2 mb-7">
               {/* Cek Bibir Card */}
-              <TouchableOpacity className="flex-1 h-[140px] rounded-[20px] relative overflow-hidden bg-[#FF9A6C]">
-                <View className="flex-1 p-4 justify-between">
-                  <View>
-                    <Text className="font-bold text-white text-lg mb-1">
-                      Cek Kondisi Bibir
-                    </Text>
-                    <Text className="font-regular text-white/80 text-[10px]">
-                      Sekilas kondisi fisik
-                    </Text>
-                  </View>
-                  <View className="flex-row justify-between items-end">
-                    <View className="bg-white py-1.5 px-4 rounded-[15px] flex-row items-center gap-1">
-                      <ScanIcon width={14} height={14} color="black" />
-                      <Text className="font-bold text-[10px] text-dark">
-                        Cek
-                      </Text>
-                    </View>
-                  </View>
-                  {/* Decorative Illustration */}
-                  <View className="absolute -bottom-2 -right-2">
-                    <CekBibir
-                      width={80}
-                      height={80}
-                      color="rgba(255,255,255,0.4)"
-                    />
-                  </View>
+              <TouchableOpacity
+                onPress={() => router.push("/(app)/index")} // Placeholder to stay on page or add param
+                className="flex-1 h-[80px] rounded-[20px] relative overflow-hidden bg-[#FF9A6C] justify-center"
+              >
+                <View className="flex-1 flex-row items-center justify-between px-5">
+                  <AppText weight="bold" className="text-white text-lg">
+                    Cek Kondisi Bibir
+                  </AppText>
+                  <CekBibir width={60} height={60} color="rgba(255,255,255,0.4)" />
                 </View>
               </TouchableOpacity>
 
               {/* Lihat Pola Card */}
-              <TouchableOpacity className="flex-1 h-[140px] rounded-[20px] relative overflow-hidden bg-[#CA98ED]">
-                <View className="flex-1 p-4 justify-between">
-                  <View>
-                    <Text className="font-bold text-white text-lg mb-1">
-                      Lihat Pola
-                    </Text>
-                    <Text className="font-regular text-white/80 text-[10px]">
-                      Ringkasan kebiasaanmu
-                    </Text>
-                  </View>
-                  <View className="flex-row justify-between items-end">
-                    <View className="bg-white py-1.5 px-4 rounded-[15px] flex-row items-center gap-1">
-                      <Text className="font-bold text-[10px] text-dark">
-                        Lihat
-                      </Text>
-                      <Feather name="chevron-right" size={14} color="black" />
-                    </View>
-                    <View className="absolute -bottom-4 -right-4">
-                      <WaveIcon
-                        width={80}
-                        height={80}
-                        color="rgba(255,255,255,0.4)"
-                      />
-                    </View>
-                  </View>
+              <TouchableOpacity
+                onPress={() => router.push("/pola")}
+                className="flex-1 h-[80px] rounded-[20px] relative overflow-hidden bg-[#64748B] justify-center"
+              >
+                <View className="flex-1 flex-row items-center justify-between px-5">
+                  <AppText weight="bold" className="text-white text-lg">
+                    Lihat Pola
+                  </AppText>
+                  <LihatPola width={60} height={60} color="rgba(255,255,255,0.4)" />
                 </View>
               </TouchableOpacity>
             </View>
 
-            {/* Activity Timeline */}
+            {/* Activity Path Section */}
             <View className="mb-5">
               <View className="bg-sage self-start py-3 pr-8 pl-6 -ml-5 rounded-r-full mb-6 shadow-sm">
-                <Text className="font-bold text-white text-lg">
+                <AppText weight="bold" className="text-white text-lg">
                   Aktivitas Hari Ini
-                </Text>
+                </AppText>
               </View>
 
-              {/* Vertical Line Container */}
-              <View className="flex-row">
-                <View className="items-center mr-4 ml-1">
-                  <View className="w-4 h-4 rounded-full border-[3px] border-sage bg-white z-10" />
-                  {/* Dashed line simulation */}
-                  <View className="flex-1 w-[2px] bg-transparent border-l-2 border-dashed border-[#E3EAD3] -mt-2" />
+              <AppText
+                weight="medium"
+                className="text-base text-gray-400 mb-6"
+              >
+                Latihan singkat untuk membantu mengelola dorongan hari ini
+              </AppText>
+
+              {/* Path Container */}
+              <View className="items-center justify-center relative min-h-[500px]">
+                {/* Background Path */}
+                <Image
+                  source={AktivitasPath}
+                  style={{
+                    width: width - 40, // consistent with padding
+                    height: 500,
+                    resizeMode: "contain",
+                    position: "absolute",
+                    top: 0,
+                  }}
+                />
+
+                {/* Node 1: Active (Ruang Kendali) */}
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  className="absolute top-[135px] right-[60px] w-24 h-24 rounded-full overflow-hidden justify-center items-center shadow-lg border-[3px] border-white z-20"
+                  onPress={() => {
+                    router.push("/activities/ruang-kendali");
+                  }}
+                >
+                  <RuangKendali className="w-fit h-fit" />
+                </TouchableOpacity>
+
+                {/* Node 2: Locked */}
+                <View className="absolute top-[235px] left-[60px] w-24 h-24 rounded-full bg-[#E2E8F0] justify-center items-center border-[3px] border-white z-10">
+                  <MaterialCommunityIcons name="lock" size={24} color="#94A3B8" />
+                  <View className="absolute -bottom-6">
+                    <AppText
+                      weight="medium"
+                      className="text-[10px] text-gray-400 text-center"
+                    >
+                      Terkunci
+                    </AppText>
+                  </View>
                 </View>
 
-                <View className="flex-1 pb-5">
-                  <View className="bg-white rounded-[20px] p-4 flex-row shadow-xl elevation-sm border border-gray-50">
-                    <View className="flex-1 pr-2 justify-between">
-                      <View>
-                        <Text className="font-bold text-lg text-dark mb-1">
-                          Jeda Dorongan
-                        </Text>
-                        <View className="flex-row items-center gap-1.5 mb-2">
-                          <MaterialCommunityIcons
-                            name="timer-outline"
-                            size={14}
-                            color="#9CA3AF"
-                          />
-                          <Text className="font-medium text-xs text-gray-400">
-                            2 menit
-                          </Text>
-                        </View>
-                        <Text className="font-regular text-xs text-gray-500 mb-4 leading-5">
-                          Luangkan waktu sejenak untuk...
-                        </Text>
-                      </View>
-
-                      <TouchableOpacity className="flex-row items-center">
-                        <Text className="font-bold text-sm text-sage mr-1">
-                          Lihat
-                        </Text>
-                        <Feather
-                          name="chevron-right"
-                          size={16}
-                          color="#728C69"
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    {/* Illustration for Activity */}
-                    <View className="w-32 h-32 rounded-[16px] overflow-hidden ml-2 shadow-sm">
-                      <JedaDorongan width={120} height={115} />
-                    </View>
+                {/* Node 3: Locked */}
+                <View className="absolute top-[370px] right-[60px] w-24 h-24 rounded-full bg-[#E2E8F0] justify-center items-center border-[3px] border-white z-10">
+                  <MaterialCommunityIcons name="lock" size={24} color="#94A3B8" />
+                  <View className="absolute -bottom-6">
+                    <AppText
+                      weight="medium"
+                      className="text-[10px] text-gray-400 text-center"
+                    >
+                      Terkunci
+                    </AppText>
                   </View>
                 </View>
               </View>
@@ -248,9 +249,9 @@ const HariIniScreen = () => {
             {/* Footer Quote */}
             <View className="items-center py-7 gap-2.5">
               <AsteriskIcon width={40} height={40} color="#728C69" />
-              <Text className="font-bold text-sm text-dark text-center">
+              <AppText weight="bold" className="text-sm text-dark text-center">
                 Satu aktivitas per hari sudah berarti.
-              </Text>
+              </AppText>
             </View>
           </View>
         </ScrollView>

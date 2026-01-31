@@ -75,14 +75,13 @@ export default function AppLayout() {
           left: 20,
           right: 20,
           backgroundColor: "#ffffff",
-          borderRadius: 15,
           height: 100,
           paddingTop: 25,
           paddingBottom: 40, // push labels up slightly
           ...styles.shadow,
         },
         tabBarLabelStyle: {
-          fontFamily: "Gilroy-Bold",
+          fontFamily: "Apercu-Medium",
           fontSize: 12,
         },
       }}
@@ -135,14 +134,11 @@ export default function AppLayout() {
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
           tabBarLabel: () => null, // No label for middle button
+          // This makes the screen transparent over the previous one
+          presentation: "transparentModal",
+          animation: "fade",
         }}
-        listeners={() => ({
-          tabPress: (e) => {
-            e.preventDefault(); // Prevent navigation
-            // TODO: Open modal or action
-            console.log("Central button pressed");
-          },
-        })}
+        // Listener removed to allow default navigation
       />
       <Tabs.Screen
         name="pola"
@@ -156,7 +152,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="kamu"
+        name="profile"
         options={{
           tabBarLabel: "Kamu",
           tabBarIcon: ({ size, focused }) =>
