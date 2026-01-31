@@ -97,17 +97,26 @@ export const usePanicButton = () => {
   };
 
   const handleUploadAndProceed = async () => {
-    setPhase("uploading");
-
+    // 1. Start upload in background (fire and forget for UI purposes)
     if (photoUri) {
-      await uploadPanicLog({
+      uploadPanicLog({
         targetName: targetItem.name,
         challengeDuration: 45 - challengeTimer,
         photoUri,
-      });
+      }).catch(err => console.error("Background upload failed:", err));
     }
 
+    // 2. Immediately proceed to next phase
     setPhase("post_intervention_1");
+  };
+
+  const restartPanicFlow = () => {
+    startPanicFlow();
+  };
+
+  const navigateToBreathing = () => {
+    setPhase("idle"); // Clear current state
+    router.push("/activities/ruang-kendali");
   };
 
   const resetFlow = () => {
@@ -131,5 +140,7 @@ export const usePanicButton = () => {
     takePicture,
     handleUploadAndProceed,
     resetFlow,
+    restartPanicFlow,
+    navigateToBreathing,
   };
 };

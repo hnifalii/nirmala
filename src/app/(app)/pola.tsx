@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,41 +6,49 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { Title, Body, Label, Subtitle } from "../../components/Typography";
 import { Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import BottomMascot from "../../../assets/icons/bottom-mascot.svg";
 import TopMascot from "../../../assets/icons/maskot-main.png";
+import { PatternService, PatternData } from "../../services/PatternService";
+
 const { width } = Dimensions.get("window");
 
-// Mock Data for Calendar
 const DAYS_IN_MONTH = 30;
 const START_DAY_OFFSET = 2; // Starts on Wednesday
-const CALENDAR_DATA = Array.from({ length: DAYS_IN_MONTH }).map(() =>
-  Math.random() > 0.3 ? (Math.random() > 0.6 ? 2 : 1) : 0,
-);
 const DAYS_OF_WEEK = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
-// Mock Data for Bar Chart
-const CHART_DATA = [
-  { day: "Sen", value: 4000 },
-  { day: "Sel", value: 6000 },
-  { day: "Rab", value: 3000 },
-  { day: "Kam", value: 8000 },
-  { day: "Jum", value: 5000 },
-  { day: "Sab", value: 9000 },
-  { day: "Min", value: 7000 },
-];
-const Y_LABELS = ["10rb", "8rb", "6rb", "4rb", "2rb"];
+// Y Labels should be dynamic based on max value, but keeping static for now or ensuring max match
+const Y_LABELS = ["50rb", "40rb", "30rb", "20rb", "10rb"]; // Updated scale for money
 
 export default function PolaScreen() {
+  const [data, setData] = useState<PatternData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const service = new PatternService();
+      const result = await service.getPatternData();
+      setData(result);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
   const renderHeatmap = () => {
+    if (!data) return null;
+
+    // Ensure we have 30 days of data for the grid
+    const heatmapData = data.heatmap || Array(30).fill(0);
+
     return (
       <View style={styles.heatmapContainer}>
         {/* Month Year Header */}
         <View style={styles.calendarTitleRow}>
           <Body weight="bold" style={{ fontSize: 16 }}>
-            September 2026
+            Bulan Ini
           </Body>
         </View>
 
@@ -61,17 +69,16 @@ export default function PolaScreen() {
           ))}
 
           {/* Actual Days */}
-          {Array.from({ length: DAYS_IN_MONTH }).map((_, index) => {
-            const value = CALENDAR_DATA[index];
+          {heatmapData.map((value, index) => {
             let backgroundColor = "#F3F4F6"; // Default grey
             let textColor = "#6B7280";
 
             if (value === 1) {
-              backgroundColor = "#A7F3D0"; // Light Green
+              backgroundColor = "#A7F3D0"; // Light Green (Partial/Relapse?)
               textColor = "#065F46";
             }
             if (value === 2) {
-              backgroundColor = "#10B981"; // Strong Green
+              backgroundColor = "#10B981"; // Strong Green (Success)
               textColor = "#FFFFFF";
             }
 
@@ -102,13 +109,16 @@ export default function PolaScreen() {
     );
   };
 
-  // ... renderBarChart remains the same ...
   const renderBarChart = () => {
-    const maxValue = 10000;
+    if (!data) return null;
+
+    const chartData = data.chart;
+    const maxValue = 50000; // Set explicit max for Money Saved for now
+
     return (
       <View style={styles.chartContainer}>
         <View style={styles.chartHeader}>
-          <Subtitle weight="bold">Rokok Dihindari</Subtitle>
+          <Subtitle weight="bold">Uang Hemat (7 Hari)</Subtitle>
           <View style={styles.periodSelector}>
             <Label style={{ fontSize: 12, marginRight: 4 }}>Minggu</Label>
             <Ionicons name="chevron-down" size={12} color="#333" />
@@ -134,13 +144,15 @@ export default function PolaScreen() {
 
             {/* Bar Items */}
             <View style={styles.barsRow}>
-              {CHART_DATA.map((item, index) => (
+              {chartData.map((item, index) => (
                 <View key={index} style={styles.barWrapper}>
                   <View style={styles.barTrack}>
                     <View
                       style={[
                         styles.barFill,
-                        { height: `${(item.value / maxValue) * 100}%` },
+                        {
+                          height: `${Math.min((item.value / maxValue) * 100, 100)}%`,
+                        },
                       ]}
                     />
                   </View>
@@ -154,7 +166,18 @@ export default function PolaScreen() {
     );
   };
 
-  // ... rest of component ...
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -177,21 +200,21 @@ export default function PolaScreen() {
         <View style={styles.mainStat}>
           <Label color="rgba(255,255,255,0.7)">Runtunan Saat Ini</Label>
           <Title color="#fff" style={{ fontSize: 40, marginTop: 4 }}>
-            14 Hari
+            {data?.stats.currentStreak || 0} Hari
           </Title>
           <View style={styles.subStatRow}>
             <View style={styles.subStatBadge}>
               <Ionicons name="arrow-up-circle" size={16} color="#10B981" />
               <Label color="#fff" weight="medium" style={{ marginLeft: 4 }}>
                 {" "}
-                Hemat Rp 420rb
+                Hemat Rp {(data?.stats.moneySaved || 0).toLocaleString()}
               </Label>
             </View>
             <View style={styles.subStatBadge}>
               <Ionicons name="arrow-down-circle" size={16} color="#F59E0B" />
               <Label color="#fff" weight="medium" style={{ marginLeft: 4 }}>
                 {" "}
-                280 Rokok
+                {data?.stats.cigarettesAvoided || 0} Rokok
               </Label>
             </View>
           </View>
@@ -235,7 +258,10 @@ export default function PolaScreen() {
                 <Body weight="bold">Waktu Rawan</Body>
                 <Label color="#6B7280">
                   Keinginan merokok sering muncul sekitar{" "}
-                  <Body weight="bold">09:00 Pagi</Body>.
+                  <Body weight="bold">
+                    {data?.insights.peakHour || "--:--"}
+                  </Body>
+                  .
                 </Label>
               </View>
             </View>
@@ -253,7 +279,8 @@ export default function PolaScreen() {
               <View style={{ flex: 1 }}>
                 <Body weight="bold">Pemicu Utama</Body>
                 <Label color="#6B7280">
-                  Stres pekerjaan teridentifikasi sebagai pemicu utama.
+                  <Body weight="bold">{data?.insights.mainTrigger}</Body>{" "}
+                  teridentifikasi sebagai pemicu utama.
                 </Label>
               </View>
             </View>

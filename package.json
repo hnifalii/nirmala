@@ -17,6 +17,7 @@
     "axios": "^1.13.2",
     "cloudinary": "^2.9.0",
     "expo": "~54.0.31",
+    "expo-blur": "~15.0.8",
     "expo-build-properties": "~1.0.10",
     "expo-camera": "~17.0.10",
     "expo-constants": "~18.0.13",
