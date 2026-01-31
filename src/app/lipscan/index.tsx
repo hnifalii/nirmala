@@ -6,6 +6,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { AppText } from "../../components/Typography";
 // import ArrowLeft from "../../../../assets/icons/arrow-left.svg";
 import LipsFrame from "../../../assets/lips.png";
+import ArrowLeft from "../../../assets/icons/arrow-left.svg";
 import LipsOutline from "../../../assets/icons/lips-outline.svg";
 import ScanIcon from "../../../assets/icons/lip-scan.svg";
 import LipsIcon from "../../../assets/icons/lip-lips.svg";
@@ -14,6 +15,7 @@ import SparkIcon from "../../../assets/icons/lip-spark.svg";
 import Step1 from "../../../assets/images/lipscan/step1.png";
 import Step2 from "../../../assets/images/lipscan/step2.png";
 import Step4 from "../../../assets/images/lipscan/step4.png";
+import MainIcon from "../../../assets/icons/bottom-main.svg";
 
 const { width, height } = Dimensions.get("window");
 
@@ -98,13 +100,13 @@ export default function LipCheckScreen() {
 
       {/* Header */}
       <View className="flex-row items-center pt-12 pb-4 px-6 bg-[#FFFDF7] z-10">
-        <TouchableOpacity
-          className="w-10 h-10 items-center justify-center rounded-full active:bg-gray-100 -ml-2"
-          onPress={handleBack}
-        >
-          {/* <ArrowLeft width={24} height={24} color="#000000" /> */}
-          <AppText className="text-xl">←</AppText>
-        </TouchableOpacity>
+          <TouchableOpacity
+            className="w-10 h-10 rounded-full text-black items-center justify-center"
+            onPress={handleBack}
+            activeOpacity={0.7}
+          >
+            <ArrowLeft width={24} height={24} fill="#000000" color="#000000" />
+          </TouchableOpacity>
         <AppText weight="bold" className="text-xl text-gray-900 ml-4 flex-1 text-center pr-10">
           Cek Kondisi Bibir
         </AppText>
@@ -240,12 +242,12 @@ export default function LipCheckScreen() {
                 facing="front"
              >
                 {/* Header Overlay */}
-                <View className="absolute top-0 left-0 right-0 pt-12 pb-6 px-6 bg-black/40 z-20 flex-row items-center">
+                <View className="absolute top-0 left-0 right-0 py-6 px-6 bg-[#728C69] z-20 flex-row items-center">
                      <TouchableOpacity 
                         className="w-10 h-10 items-center justify-center bg-white/20 rounded-full"
                         onPress={handleCloseCamera}
                      >
-                        <AppText className="text-white text-xl">←</AppText>
+                        <ArrowLeft width={24} height={24} color="white"/>
                      </TouchableOpacity>
                      <AppText weight="bold" className="text-white text-lg ml-4">
                         Pindai Kondisi Bibir
@@ -283,15 +285,12 @@ export default function LipCheckScreen() {
                         </View>
 
                         {/* Bottom Block */}
-                        <View className="flex-1 bg-black/60 items-center pt-8">
+                        <View className="flex-1 bg-black/60 items-center pt-4">
                              {/* Helper Box */}
                              <View className="bg-white/90 rounded-xl p-4 flex-row items-center w-[80%]">
-                                <View className="w-12 h-12 bg-[#FF9A6C] rounded-lg mr-4 items-center justify-center">
-                                    <LipsOutline width={24} height={24} />
-                                </View>
                                 <View className="flex-1">
-                                    <AppText weight="bold" className="text-gray-900 text-sm mb-1">Panduan cek bibir</AppText>
-                                    <AppText className="text-gray-600 text-xs leading-4">Posisikan bibir di dalam area frame dan tahan sebentar</AppText>
+                                    <AppText weight="bold" className="text-gray-900 mb-1">Panduan cek bibir</AppText>
+                                    <AppText className="text-gray-600 text-sm leading-4">Posisikan bibir di dalam area frame dan tahan sebentar</AppText>
                                 </View>
                              </View>
                         </View>
@@ -299,7 +298,7 @@ export default function LipCheckScreen() {
                 </View>
 
                 {/* Capture Controls */}
-                <View className="absolute bottom-0 left-0 right-0 pb-12 pt-6 bg-black/40 items-center z-20 rounded-t-[32px]">
+                <View className="absolute bottom-0 left-0 right-0 pb-6 pt-6 bg-black/40 items-center z-20 rounded-t-[32px]">
                     <TouchableOpacity
                       onPress={handleTakePicture}
                       className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center bg-white/20 active:scale-95"
@@ -318,9 +317,7 @@ export default function LipCheckScreen() {
                  <View className="absolute inset-0 top-0 bottom-0 left-0 right-0 bg-black/60 z-50 items-center justify-center backdrop-blur-sm">
                       <View className="bg-[#FFFDF7] p-8 rounded-[32px] items-center w-[280px]">
                            {/* Loading Spinner / Icon */}
-                           <View className="w-20 h-20 bg-blue-100 rounded-full mb-6 items-center justify-center animate-pulse">
-                                <View className="w-12 h-12 bg-blue-300 rounded-xl" />
-                           </View>
+                          <MainIcon />
                            
                            <AppText weight="bold" className="text-gray-800 text-lg text-center">
                                Memproses...
@@ -354,9 +351,9 @@ function LipResultView({
   };
 
   const statusColor = 
-    result.status.level === "baik" ? "bg-green-100 text-green-800" :
-    result.status.level === "perlu perhatian ringan" ? "bg-yellow-400 text-yellow-800" :
-    "bg-red-100 text-red-800";
+    result.status.level === "baik" ? "bg-green-100 text-white" :
+    result.status.level === "perlu perhatian ringan" ? "bg-yellow-400 text-white" :
+    "bg-red-100 text-white";
     
   // Map level to display label
   const statusLabel = 
@@ -368,9 +365,13 @@ function LipResultView({
     <View className="flex-1 bg-[#FFFDF7]">
       {/* Header Result */}
       <View className="pt-12 pb-4 px-6 bg-[#728C69] z-10 flex-row items-center">
-         <TouchableOpacity onPress={onBack} className="mr-4">
-            <AppText className="text-white text-xl">←</AppText>
-         </TouchableOpacity>
+          <TouchableOpacity
+            className="absolute top-12 left-6 z-20 w-10 h-10 rounded-full bg-white/20 items-center justify-center"
+            onPress={onBack}
+            activeOpacity={0.7}
+          >
+            <ArrowLeft width={24} height={24} />
+          </TouchableOpacity>
          <AppText weight="bold" className="text-white text-lg flex-1 text-center pr-8">
             Hasil Cek Bibir
          </AppText>
